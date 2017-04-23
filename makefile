@@ -1,10 +1,15 @@
+SRCD = src
+INCD = include
+OBJD = build
+
 CC = g++
 CFLG = -std=c++14 -g -Wall
-INCS =
+INCS = -Iinclude
 LFLG =
-LIBS = -lglfw
-SRCS = $(wildcard *.cpp)
-OBJS = $(SRCS:.cpp=.o)
+LIBS = -lglfw -ldl
+
+SRCS = $(shell find $(SRCD) -name *.cpp -or -name *.c)
+OBJS = $(patsubst $(SRCD)/%.c,$(OBJD)/%.o,$(patsubst $(SRCD)/%.cpp,$(OBJD)/%.o,$(SRCS)))
 DEPS = $(OBJS:.o=.d)
 EXEC = smoke
 
@@ -15,9 +20,13 @@ all: $(OBJS)
 
 -include $(DEPS)
 
-%.o: %.cpp
+$(OBJD)/%.o: $(SRCD)/%.cpp
 	$(CC) $(CFLG) $(INCS) -c  $< -o $@
-	@$(CC) $(CFLG) $(INCS) -MM $< > $*.d
+	@$(CC) $(CFLG) $(INCS) -MM $< > $(OBJD)/$*.d
+
+$(OBJD)/%.o: $(SRCD)/%.c
+	$(CC) $(CFLG) $(INCS) -c  $< -o $@
+	@$(CC) $(CFLG) $(INCS) -MM $< > $(OBJD)/$*.d
 
 clean:
 	rm -f $(OBJS) $(DEPS) $(EXEC)
