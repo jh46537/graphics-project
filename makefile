@@ -23,10 +23,12 @@ all: $(OBJS)
 $(OBJD)/%.o: $(SRCD)/%.cpp
 	$(CC) $(CFLG) $(INCS) -c  $< -o $@
 	@$(CC) $(CFLG) $(INCS) -MM $< > $(OBJD)/$*.d
+	@sed -i 's/^.*:/build\/&/' $(OBJD)/$*.d
 
 $(OBJD)/%.o: $(SRCD)/%.c
 	$(CC) $(CFLG) $(INCS) -c  $< -o $@
 	@$(CC) $(CFLG) $(INCS) -MM $< > $(OBJD)/$*.d
+	@sed -i 's/^.*:/build\/&/' $(OBJD)/$*.d
 
 clean:
 	rm -f $(OBJS) $(DEPS) $(EXEC)
