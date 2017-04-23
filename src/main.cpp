@@ -2,14 +2,19 @@
 
 int main(int argc, char** argv)
 {
-    // parameters
+    /*
+     * parameters
+     */
     int width  = 1280;
     int height = 720;
     const char* name = "window";
 
-    // initialize window
+
+    /*
+     * initialize window
+     */
     if (!glfwInit()) {
-        cout << "[failed to initialize glfw]" << endl;
+        cerr << "[failed to initialize glfw]" << endl;
         exit(-1);
     }
 
@@ -19,36 +24,40 @@ int main(int argc, char** argv)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 
     GLFWwindow* window = glfwCreateWindow(width, height, name, NULL, NULL);
-    if (!window) { glfwTerminate(); exit(-1); }
+    if (!window) {
+        glfwTerminate();
+        cerr << "[failed to create window]" << endl;
+        exit(-1);
+    }
 
     //glfwSetKeyCallback(window, keyboardCallback);
     glfwMakeContextCurrent(window);
 
-//    // initialize OpenGL
-//    if (
-//
-//    if(gl3wInit()) {
-//        std::cerr << "Could not initialize OpenGL\n";
-//        exit(1);
-//    }
-//
-//    if(! gl3wIsSupported(4, 1)) {
-//        std::cerr << "OpenGL 4.1 not supported\n";
-//        exit(1);
-//    }
-//
-//    // Enable depth test
-//    glEnable(GL_DEPTH_TEST);
-//
-//    // Accept fragment if it closer to the camera than the former one
-//    glDepthFunc(GL_LESS);
-//
-//    // Enable blending
-//    glEnable(GL_BLEND);
-//    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-//    glEnable(GL_DEPTH_TEST);
 
-    while (true) {}
+    /*
+     * initialize OpenGL
+     */
+    if (gl3wInit()) {
+        cerr << "[failed to initialize OpenGL]" << endl;
+        exit(-1);
+    }
+
+    if (!gl3wIsSupported(4, 1)) {
+        cerr << "[OpenGL 4.1 not supported]" << endl;
+        exit(-1);
+    }
+
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+
+    /*
+     * program
+     */
+    while (true);
 
     return 0;
 }
