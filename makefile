@@ -13,14 +13,15 @@ OBJS = $(patsubst $(SRCD)/%.c,$(OBJD)/%.o,$(patsubst $(SRCD)/%.cpp,$(OBJD)/%.o,$
 DEPS = $(OBJS:.o=.d)
 EXEC = smoke
 
-.PHONY: all clean run
+.PHONY: all $(OBJD) clean run
 
-all: $(OBJS)
+all: $(OBJD) $(OBJS)
 	$(CC) $(OBJS) -o $(EXEC) $(LFLG) $(LIBS)
 
 -include $(DEPS)
 
 $(OBJD)/%.o: $(SRCD)/%.cpp
+
 	$(CC) $(CFLG) $(INCS) -c  $< -o $@
 	@$(CC) $(CFLG) $(INCS) -MM $< > $(OBJD)/$*.d
 	@sed -i 's/^.*:/build\/&/' $(OBJD)/$*.d
@@ -29,6 +30,9 @@ $(OBJD)/%.o: $(SRCD)/%.c
 	$(CC) $(CFLG) $(INCS) -c  $< -o $@
 	@$(CC) $(CFLG) $(INCS) -MM $< > $(OBJD)/$*.d
 	@sed -i 's/^.*:/build\/&/' $(OBJD)/$*.d
+
+$(OBJD):
+	mkdir -p $(OBJD)
 
 clean:
 	rm -f $(OBJS) $(DEPS) $(EXEC)
