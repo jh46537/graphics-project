@@ -8,7 +8,8 @@ int main(int argc, char** argv)
     int width  = 1280;
     int height = 720;
     const char* name = "window";
-    const char* shader_file_name = "color.frag";
+    const char* vert_shader_file_name = "shader.vert";
+    const char* frag_shader_file_name = "shader.frag";
     constexpr size_t log_size = 1024;
     GLchar log[log_size];
 
@@ -53,8 +54,8 @@ int main(int argc, char** argv)
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
 
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    //glEnable(GL_BLEND);
+    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 
     /*
@@ -91,65 +92,127 @@ int main(int argc, char** argv)
     /*
      * shader
      */
-    GLuint program = glCreateProgram();
-    if (!program) {
-        cerr << "[failed to create shader program]" << endl;
-        exit(-1);
-    }
-
-    GLuint shader = glCreateShader(GL_FRAGMENT_SHADER);
-    if (!shader) {
-        cerr << "[failed to create shader type]" << endl;
-        exit(-1);
-    }
-
-    std::ifstream file {shader_file_name, std::ios::binary | std::ios::ate};
-    if (!file.is_open()) {
-        cerr << "[failed to open shader file: " << shader_file_name << "]" << endl;
-        exit(-1);
-    }
-
-    size_t file_size = file.tellg();
-    std::string file_data( file_size, '\0' );
-    file.seekg(0, std::ios::beg);
-    if (!file.read(&file_data[0], file_size)) {
-        cerr << "[failed to read shader file: " << shader_file_name << "]" << endl;
-        exit(-1);
-    }
-
-    const GLchar* shader_data[1] = {file_data.c_str()};
-    const GLint   shader_size[1] = {(GLint) file_size};
-
-    glShaderSource(shader, 1, shader_data, shader_size);
-    glCompileShader(shader);
-
     GLint status;
-    glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
-    if (!status) {
-        glGetShaderInfoLog(shader, log_size, NULL, log);
-        cerr << "[failed to compile shader: " << shader_file_name << "]" << endl << log;
+
+
+    GLuint vert_program = glCreateProgram();
+    if (!vert_program) {
+        cerr << "[failed to create vertex shader program]" << endl;
         exit(-1);
     }
 
-    glAttachShader(program, shader);
-
-    glLinkProgram(program);
-    glGetProgramiv(program, GL_LINK_STATUS, &status);
-    if (!status) {
-        glGetProgramInfoLog(program, log_size * sizeof(GLchar), NULL, log);
-        cerr << "[failed to link shader program]" << endl << log;
+    GLuint vert_shader = glCreateShader(GL_VERTEX_SHADER);
+    if (!vert_shader) {
+        cerr << "[failed to create vertex shader]" << endl;
         exit(-1);
     }
 
-    glValidateProgram(program);
-    glGetProgramiv(program, GL_VALIDATE_STATUS, &status);
-    if (!status) {
-        glGetProgramInfoLog(program, log_size * sizeof(GLchar), NULL, log);
-        cerr << "[failed to validate shader program]" << endl << log;
+    std::ifstream vert_file {vert_shader_file_name, std::ios::binary | std::ios::ate};
+    if (!vert_file.is_open()) {
+        cerr << "[failed to open shader file: " << vert_shader_file_name << "]" << endl;
         exit(-1);
     }
 
-    glUseProgram(program);
+    size_t vert_file_size = vert_file.tellg();
+    std::string vert_file_data( vert_file_size, '\0' );
+    vert_file.seekg(0, std::ios::beg);
+    if (!vert_file.read(&vert_file_data[0], vert_file_size)) {
+        cerr << "[failed to read shader file: " << vert_shader_file_name << "]" << endl;
+        exit(-1);
+    }
+
+    const GLchar* vert_shader_data[1] = {vert_file_data.c_str()};
+    const GLint   vert_shader_size[1] = {(GLint) vert_file_size};
+
+    glShaderSource(vert_shader, 1, vert_shader_data, vert_shader_size);
+    glCompileShader(vert_shader);
+
+    glGetShaderiv(vert_shader, GL_COMPILE_STATUS, &status);
+    if (!status) {
+        glGetShaderInfoLog(vert_shader, log_size, NULL, log);
+        cerr << "[failed to compile shader: " << vert_shader_file_name << "]" << endl << log;
+        exit(-1);
+    }
+
+    glAttachShader(vert_program, vert_shader);
+
+    glLinkProgram(vert_program);
+    glGetProgramiv(vert_program, GL_LINK_STATUS, &status);
+    if (!status) {
+        glGetProgramInfoLog(vert_program, log_size * sizeof(GLchar), NULL, log);
+        cerr << "[failed to link vertex shader program]" << endl << log;
+        exit(-1);
+    }
+
+    glValidateProgram(vert_program);
+    glGetProgramiv(vert_program, GL_VALIDATE_STATUS, &status);
+    if (!status) {
+        glGetProgramInfoLog(vert_program, log_size * sizeof(GLchar), NULL, log);
+        cerr << "[failed to validate vertex shader program]" << endl << log;
+        exit(-1);
+    }
+
+    glUseProgram(vert_program);
+
+
+    GLuint frag_program = glCreateProgram();
+    if (!frag_program) {
+        cerr << "[failed to create fragment shader program]" << endl;
+        exit(-1);
+    }
+
+    GLuint frag_shader = glCreateShader(GL_FRAGMENT_SHADER);
+    if (!frag_shader) {
+        cerr << "[failed to create fragment shader]" << endl;
+        exit(-1);
+    }
+
+    std::ifstream frag_file {frag_shader_file_name, std::ios::binary | std::ios::ate};
+    if (!frag_file.is_open()) {
+        cerr << "[failed to open shader file: " << frag_shader_file_name << "]" << endl;
+        exit(-1);
+    }
+
+    size_t frag_file_size = frag_file.tellg();
+    std::string frag_file_data( frag_file_size, '\0' );
+    frag_file.seekg(0, std::ios::beg);
+    if (!frag_file.read(&frag_file_data[0], frag_file_size)) {
+        cerr << "[failed to read shader file: " << frag_shader_file_name << "]" << endl;
+        exit(-1);
+    }
+
+    const GLchar* frag_shader_data[1] = {frag_file_data.c_str()};
+    const GLint   frag_shader_size[1] = {(GLint) frag_file_size};
+
+    glShaderSource(frag_shader, 1, frag_shader_data, frag_shader_size);
+    glCompileShader(frag_shader);
+
+    glGetShaderiv(frag_shader, GL_COMPILE_STATUS, &status);
+    if (!status) {
+        glGetShaderInfoLog(frag_shader, log_size, NULL, log);
+        cerr << "[failed to compile shader: " << frag_shader_file_name << "]" << endl << log;
+        exit(-1);
+    }
+
+    glAttachShader(frag_program, frag_shader);
+
+    glLinkProgram(frag_program);
+    glGetProgramiv(frag_program, GL_LINK_STATUS, &status);
+    if (!status) {
+        glGetProgramInfoLog(frag_program, log_size * sizeof(GLchar), NULL, log);
+        cerr << "[failed to link fragment shader program]" << endl << log;
+        exit(-1);
+    }
+
+    glValidateProgram(frag_program);
+    glGetProgramiv(frag_program, GL_VALIDATE_STATUS, &status);
+    if (!status) {
+        glGetProgramInfoLog(frag_program, log_size * sizeof(GLchar), NULL, log);
+        cerr << "[failed to validate fragment shader program]" << endl << log;
+        exit(-1);
+    }
+
+    glUseProgram(frag_program);
 
 
     /*
