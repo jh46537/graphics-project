@@ -7,7 +7,7 @@ int main(int argc, char** argv)
      */
     int width  = 1000;
     int height = 1000;
-    const char* name = "window";
+    const char* name = "smoke";
     const char* vert_shader_file_name = "shader.vert";
     const char* frag_shader_file_name = "shader.frag";
     constexpr size_t log_size = 1024;
@@ -67,10 +67,10 @@ int main(int argc, char** argv)
 
     constexpr float irt3 = 1.0f / sqrt(3);
     vec3 vertices[] = {
-          vec3{ 0.0f , -irt3 / 2, -irt3   }
-        , vec3{ -0.5f, -irt3 / 2, irt3 / 2}
-        , vec3{ 0.5f , -irt3 / 2, irt3 / 2}
-        , vec3{ 0.0f , irt3     , 0.0f    }
+          vec3{ 0.0f , -irt3 / 2, irt3     }, vec3{1.0f, 1.0f, 1.0f}
+        , vec3{ -0.5f, -irt3 / 2, -irt3 / 2}, vec3{1.0f, 0.0f, 0.0f}
+        , vec3{ 0.5f , -irt3 / 2, -irt3 / 2}, vec3{0.0f, 1.0f, 0.0f}
+        , vec3{ 0.0f , irt3     , 0.0f     }, vec3{0.0f, 0.0f, 1.0f}
     };
     GLuint vbo;
     glGenBuffers(1, &vbo);
@@ -78,11 +78,10 @@ int main(int argc, char** argv)
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices) * sizeof(vec3), vertices, GL_STATIC_DRAW);
 
     GLuint indices[] = {
-        //  0, 1, 2
-        //, 0, 2, 3
-        //, 0, 3, 1
-        //, 1, 3, 2
-         1, 3, 2
+          0, 1, 2
+        , 0, 2, 3
+        , 0, 3, 1
+        , 1, 3, 2
     };
     GLuint ibo;
     glGenBuffers(1, &ibo);
@@ -201,9 +200,12 @@ int main(int argc, char** argv)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glBindBuffer(GL_ARRAY_BUFFER, vao);
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(0));
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
         glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(GLuint), GL_UNSIGNED_INT, 0);
         glDisableVertexAttribArray(0);
+        glDisableVertexAttribArray(1);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glfwSwapBuffers(window);
         glfwPollEvents();
