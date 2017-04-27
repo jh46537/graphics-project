@@ -5,8 +5,10 @@ int main(int argc, char** argv)
     /*
      * parameters
      */
-    int width  = 1000;
-    int height = 1000;
+    constexpr uint32_t version_major = 3;
+    constexpr uint32_t version_minor = 0;
+    constexpr uint32_t width  = 1000;
+    constexpr uint32_t height = 1000;
     const char* name = "smoke";
     const char* vert_shader_file_name = "shader.vert";
     const char* frag_shader_file_name = "shader.frag";
@@ -22,10 +24,11 @@ int main(int argc, char** argv)
         exit(-1);
     }
 
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+    //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_OPENGL_ANY_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, version_major);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, version_minor);
 
     GLFWwindow* window = glfwCreateWindow(width, height, name, NULL, NULL);
     if (!window) {
@@ -46,8 +49,8 @@ int main(int argc, char** argv)
         exit(-1);
     }
 
-    if (!gl3wIsSupported(4, 1)) {
-        cerr << "[OpenGL 4.1 not supported]" << endl;
+    if (!gl3wIsSupported(version_major, version_minor)) {
+        cerr << "[OpenGL " << version_major << "." << version_minor << " not supported]" << endl;
         exit(-1);
     }
 
@@ -172,6 +175,10 @@ int main(int argc, char** argv)
     }
 
     glAttachShader(program, frag_shader);
+
+    
+   glBindAttribLocation(program, 0, "position");
+   glBindAttribLocation(program, 1, "in_color");
 
 
     glLinkProgram(program);
