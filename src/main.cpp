@@ -5,8 +5,8 @@ int main(int argc, char** argv)
     /*
      * parameters
      */
-    int width  = 1280;
-    int height = 720;
+    int width  = 1000;
+    int height = 1000;
     const char* name = "window";
     const char* vert_shader_file_name = "shader.vert";
     const char* frag_shader_file_name = "shader.frag";
@@ -67,26 +67,27 @@ int main(int argc, char** argv)
 
     constexpr float irt3 = 1.0f / sqrt(3);
     vec3 vertices[] = {
-          vec3{ 0.0f , -irt3 / 2, -irt3    }
-        , vec3{ -0.5f, -irt3 / 2, irt3 / 2 }
-        , vec3{ 0.5f , -irt3 / 2, irt3 / 2 }
-        , vec3{ 0.0f , irt3     , 0.0f     }
+          vec3{ 0.0f , -irt3 / 2, -irt3   }
+        , vec3{ -0.5f, -irt3 / 2, irt3 / 2}
+        , vec3{ 0.5f , -irt3 / 2, irt3 / 2}
+        , vec3{ 0.0f , irt3     , 0.0f    }
     };
     GLuint vbo;
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices) * sizeof(vec3), vertices, GL_STATIC_DRAW);
 
-    size_t indices[] = {
-          0, 1, 2
-        , 0, 2, 3
-        , 0, 3, 1
-        , 1, 3, 2
+    GLuint indices[] = {
+        //  0, 1, 2
+        //, 0, 2, 3
+        //, 0, 3, 1
+        //, 1, 3, 2
+         1, 3, 2
     };
     GLuint ibo;
     glGenBuffers(1, &ibo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices) * sizeof(size_t), indices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices) * sizeof(GLuint), indices, GL_STATIC_DRAW);
 
 
     /*
@@ -94,12 +95,12 @@ int main(int argc, char** argv)
      */
     GLint status;
 
-
-    GLuint vert_program = glCreateProgram();
-    if (!vert_program) {
+    GLuint program = glCreateProgram();
+    if (!program) {
         cerr << "[failed to create vertex shader program]" << endl;
         exit(-1);
     }
+
 
     GLuint vert_shader = glCreateShader(GL_VERTEX_SHADER);
     if (!vert_shader) {
@@ -112,6 +113,7 @@ int main(int argc, char** argv)
         cerr << "[failed to open shader file: " << vert_shader_file_name << "]" << endl;
         exit(-1);
     }
+
 
     size_t vert_file_size = vert_file.tellg();
     std::string vert_file_data( vert_file_size, '\0' );
@@ -134,32 +136,8 @@ int main(int argc, char** argv)
         exit(-1);
     }
 
-    glAttachShader(vert_program, vert_shader);
+    glAttachShader(program, vert_shader);
 
-    glLinkProgram(vert_program);
-    glGetProgramiv(vert_program, GL_LINK_STATUS, &status);
-    if (!status) {
-        glGetProgramInfoLog(vert_program, log_size * sizeof(GLchar), NULL, log);
-        cerr << "[failed to link vertex shader program]" << endl << log;
-        exit(-1);
-    }
-
-    glValidateProgram(vert_program);
-    glGetProgramiv(vert_program, GL_VALIDATE_STATUS, &status);
-    if (!status) {
-        glGetProgramInfoLog(vert_program, log_size * sizeof(GLchar), NULL, log);
-        cerr << "[failed to validate vertex shader program]" << endl << log;
-        exit(-1);
-    }
-
-    glUseProgram(vert_program);
-
-
-    GLuint frag_program = glCreateProgram();
-    if (!frag_program) {
-        cerr << "[failed to create fragment shader program]" << endl;
-        exit(-1);
-    }
 
     GLuint frag_shader = glCreateShader(GL_FRAGMENT_SHADER);
     if (!frag_shader) {
@@ -194,35 +172,41 @@ int main(int argc, char** argv)
         exit(-1);
     }
 
-    glAttachShader(frag_program, frag_shader);
+    glAttachShader(program, frag_shader);
 
-    glLinkProgram(frag_program);
-    glGetProgramiv(frag_program, GL_LINK_STATUS, &status);
+
+    glLinkProgram(program);
+    glGetProgramiv(program, GL_LINK_STATUS, &status);
     if (!status) {
-        glGetProgramInfoLog(frag_program, log_size * sizeof(GLchar), NULL, log);
+        glGetProgramInfoLog(program, log_size * sizeof(GLchar), NULL, log);
         cerr << "[failed to link fragment shader program]" << endl << log;
         exit(-1);
     }
 
-    glValidateProgram(frag_program);
-    glGetProgramiv(frag_program, GL_VALIDATE_STATUS, &status);
+    glValidateProgram(program);
+    glGetProgramiv(program, GL_VALIDATE_STATUS, &status);
     if (!status) {
-        glGetProgramInfoLog(frag_program, log_size * sizeof(GLchar), NULL, log);
+        glGetProgramInfoLog(program, log_size * sizeof(GLchar), NULL, log);
         cerr << "[failed to validate fragment shader program]" << endl << log;
         exit(-1);
     }
 
-    glUseProgram(frag_program);
+    glUseProgram(program);
 
 
     /*
      * render loop
      */
     while (!glfwWindowShouldClose(window)) {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glBindBuffer(GL_ARRAY_BUFFER, vao);
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-        glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(size_t), GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(GLuint), GL_UNSIGNED_INT, 0);
         glDisableVertexAttribArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glfwSwapBuffers(window);
+        glfwPollEvents();
     }
 
     glfwDestroyWindow(window);
