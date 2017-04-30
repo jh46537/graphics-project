@@ -35,7 +35,7 @@ $(OBJD):
 	mkdir -p $(OBJD)
 
 clean:
-	rm -f $(OBJS) $(DEPS) $(EXEC)
+	rm -rf $(OBJS) $(OBJSD) $(DEPS) $(EXEC)
 
 run:
 	./smoke

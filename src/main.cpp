@@ -10,8 +10,8 @@ int main(int argc, char** argv)
     constexpr uint32_t width  = 1000;
     constexpr uint32_t height = 1000;
     const char* name = "smoke";
-    const char* vert_shader_file_name = "shader.vert";
-    const char* frag_shader_file_name = "shader.frag";
+    const char* vert_shader_file_name = "shader/shader.vert";
+    const char* frag_shader_file_name = "shader/shader.frag";
     constexpr size_t log_size = 1024;
     GLchar log[log_size];
 
