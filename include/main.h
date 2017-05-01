@@ -22,8 +22,7 @@ using glm::vec4;
 using glm::mat4;
 //using glm::translate;
 
-
-#include "grid.h"
+#include "fluid.h"
 #include "gl.h"
 
 

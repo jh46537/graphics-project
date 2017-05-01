@@ -23,6 +23,7 @@ using glm::scale;
 
 
 #include "fluid.h"
+#include "grid.h"
 #include "gl.h"
 
 
@@ -269,9 +270,10 @@ bool Window::alive() const
     return !glfwWindowShouldClose(window);
 }
 
-void Window::render(const Voxel& v, const Grid& g, GLint mvp_loc) const
+void Window::render(const Voxel& v, const Fluid& sim, GLint mvp_loc) const
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    const Grid& g = sim.getGrid();
 
     for (size_t i = 0; i < g.size(); i++) {
         mat4 mvp{};

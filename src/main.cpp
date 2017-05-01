@@ -13,13 +13,13 @@ int main(int argc, char** argv)
     s.activate();
     GLint mvp_loc = s.uniform("mvp");
 
-    Grid g{ vec3{ dim_x, dim_y, dim_z }, delta};
+    Fluid sim{ vec3{ dim_x, dim_y, dim_z }, delta};
 
     /*
      * render loop
      */
     while (w.alive()) {
-        w.render(v, g, mvp_loc);
+        w.render(v, sim, mvp_loc);
     }
 
     return 0;
