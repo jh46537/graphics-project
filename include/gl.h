@@ -11,7 +11,7 @@ public:
     Voxel();
     Voxel(Voxel&&);
     ~Voxel();
-    void render(const mat4&) const;
+    void render() const;
 };
 
 
@@ -45,5 +45,5 @@ public:
     Window(size_t, size_t, size_t, size_t, const char*);
     ~Window();
     bool alive() const;
-    void render(GLint, const Voxel&) const;
+    void render(const Voxel&, const Grid&, GLint) const;
 };

@@ -19,8 +19,10 @@ using glm::vec3;
 using glm::vec4;
 using glm::mat4;
 using glm::translate;
+using glm::scale;
 
 
+#include "fluid.h"
 #include "gl.h"
 
 
@@ -77,7 +79,7 @@ Voxel::~Voxel()
     }
 }
 
-void Voxel::render(const mat4& mvp) const
+void Voxel::render() const
 {
     glBindBuffer(GL_ARRAY_BUFFER, vao);
 
@@ -251,21 +253,17 @@ bool Window::alive() const
     return !glfwWindowShouldClose(window);
 }
 
-void Window::render(GLint mvp_loc, const Voxel& v) const
+void Window::render(const Voxel& v, const Grid& g, GLint mvp_loc) const
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    //for (const auto& v: voxels) {
-    //    v.render();
-    //}
-    mat4 mvp{};
-
-    glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, glm::value_ptr(mvp));
-    v.render(mvp);
-
-    mvp = translate(mvp, vec3{-0.25, -0.25, 0.0});
-    glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, glm::value_ptr(mvp));
-    v.render(mvp);
+    for (size_t i = 0; i < g.size(); i++) {
+        mat4 mvp{};
+        mvp = translate(mvp, g[i].translate);
+        mvp = scale(mvp, vec3{ g.scale, g.scale, g.scale });
+        glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, glm::value_ptr(mvp));
+        v.render();
+    }
 
     glfwSwapBuffers(window);
     glfwPollEvents();

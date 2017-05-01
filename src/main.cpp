@@ -2,7 +2,7 @@
 
 int main(int argc, char** argv)
 {
-    Window w{version_major, version_minor, width, height, name};
+    Window w{ version_major, version_minor, width, height, name };
 
     Voxel v;
 
@@ -13,11 +13,13 @@ int main(int argc, char** argv)
     s.activate();
     GLint mvp_loc = s.uniform("mvp");
 
+    Grid g{ vec3{ dim_x, dim_y, dim_z }, delta};
+
     /*
      * render loop
      */
     while (w.alive()) {
-        w.render(mvp_loc, v);
+        w.render(v, g, mvp_loc);
     }
 
     return 0;
