@@ -37,12 +37,15 @@ Voxel::Voxel()
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
 
-    constexpr float irt3 = 1.0f / sqrt(3);
     vec3 vertices[] = {
-          vec3{ 0.0f , -irt3 / 2, irt3     }, vec3{1.0f, 1.0f, 1.0f}
-        , vec3{ -0.5f, -irt3 / 2, -irt3 / 2}, vec3{1.0f, 0.0f, 0.0f}
-        , vec3{ 0.5f , -irt3 / 2, -irt3 / 2}, vec3{0.0f, 1.0f, 0.0f}
-        , vec3{ 0.0f , irt3     , 0.0f     }, vec3{0.0f, 0.0f, 1.0f}
+          vec3{ -1.0f, -1.0f, -1.0f }, vec3{ 1.0f, 0.0f, 0.0f }
+        , vec3{  1.0f, -1.0f, -1.0f }, vec3{ 0.0f, 1.0f, 0.0f }
+        , vec3{ -1.0f,  1.0f, -1.0f }, vec3{ 0.0f, 0.0f, 1.0f }
+        , vec3{  1.0f,  1.0f, -1.0f }, vec3{ 1.0f, 1.0f, 1.0f }
+        , vec3{ -1.0f, -1.0f,  1.0f }, vec3{ 1.0f, 0.0f, 0.0f }
+        , vec3{  1.0f, -1.0f,  1.0f }, vec3{ 0.0f, 1.0f, 0.0f }
+        , vec3{ -1.0f,  1.0f,  1.0f }, vec3{ 0.0f, 0.0f, 1.0f }
+        , vec3{  1.0f,  1.0f,  1.0f }, vec3{ 1.0f, 1.0f, 1.0f }
     };
     GLuint vbo;
     glGenBuffers(1, &vbo);
@@ -51,9 +54,22 @@ Voxel::Voxel()
 
     GLuint indices[] = {
           0, 1, 2
-        , 0, 2, 3
-        , 0, 3, 1
-        , 1, 3, 2
+        , 2, 1, 3
+
+        , 0, 4, 1
+        , 1, 4, 5
+
+        , 0, 2, 4
+        , 4, 2, 6
+
+        , 1, 5, 3
+        , 3, 5, 7
+
+        , 2, 3, 6
+        , 6, 3, 7
+
+        , 5, 4, 7
+        , 7, 4, 6
     };
     index_size = sizeof(indices);
     GLuint ibo;
@@ -259,8 +275,8 @@ void Window::render(const Voxel& v, const Grid& g, GLint mvp_loc) const
 
     for (size_t i = 0; i < g.size(); i++) {
         mat4 mvp{};
-        mvp = translate(mvp, g[i].translate);
-        mvp = scale(mvp, vec3{ g.scale, g.scale, g.scale });
+        mvp = translate(mvp, g[i].translate());
+        mvp = scale(mvp, vec3{ g.scale(), g.scale(), g.scale() });
         glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, glm::value_ptr(mvp));
         v.render();
     }

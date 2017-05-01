@@ -31,11 +31,11 @@ using glm::mat4;
 constexpr size_t version_major = 3;
 constexpr size_t version_minor = 0;
 
-constexpr size_t width  = 1000;
-constexpr size_t height = 1000;
+constexpr size_t width  = 800;
+constexpr size_t height = 800;
 const     char*  name   = "smoke";
 
-constexpr size_t dim_x  = 100;
-constexpr size_t dim_y  = 100;
+constexpr size_t dim_x  = 50;
+constexpr size_t dim_y  = 50;
 constexpr size_t dim_z  = 1;
-constexpr double delta  = 1.0f/100;
+constexpr double delta  = 1.0/60;
