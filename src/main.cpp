@@ -4,22 +4,20 @@ int main(int argc, char** argv)
 {
     Window w;
 
-    vector<Voxel> v;
-    v.push_back(Voxel{});
-    v.push_back(Voxel{});
+    Voxel v;
 
     Shader s;
     s.add(GL_VERTEX_SHADER  , "shader/shader.vert");
     s.add(GL_FRAGMENT_SHADER, "shader/shader.frag");
     s.bind_attrib({"position", "in_color"});
     s.activate();
-    GLint mvp_id = s.uniform("mvp");
+    GLint mvp_loc = s.uniform("mvp");
 
     /*
      * render loop
      */
     while (w.alive()) {
-        w.render(mvp_id, v);
+        w.render(mvp_loc, v);
     }
 
     return 0;

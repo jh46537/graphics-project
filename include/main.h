@@ -16,6 +16,7 @@ using std::vector;
 #include <glm/gtc/matrix_transform.hpp>
 
 using glm::vec3;
+using glm::vec4;
 using glm::mat4;
 using glm::translate;
 

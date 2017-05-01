@@ -237,7 +237,7 @@ public:
         return !glfwWindowShouldClose(window);
     }
 
-    void render(GLint mvp_id, const vector<Voxel>& voxels)
+    void render(GLint mvp_loc, const Voxel& v)
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -246,12 +246,12 @@ public:
         //}
         mat4 mvp{};
 
-        glUniformMatrix4fv(mvp_id, 1, GL_FALSE, glm::value_ptr(mvp));
-        voxels[0].render(mvp);
+        glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, glm::value_ptr(mvp));
+        v.render(mvp);
 
         mvp = translate(mvp, vec3{-0.25, -0.25, 0.0});
-        glUniformMatrix4fv(mvp_id, 1, GL_FALSE, glm::value_ptr(mvp));
-        voxels[1].render(mvp);
+        glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, glm::value_ptr(mvp));
+        v.render(mvp);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
