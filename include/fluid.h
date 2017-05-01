@@ -9,6 +9,9 @@ public:
     {
         vec3 t;
 
+        vec3 velocity;
+        float quantity;
+
     public:
 
         Cell(vec3 t) : t(t) {};
@@ -16,6 +19,16 @@ public:
         const vec3 translate() const
         {
             return t;
+        }
+
+        const vec3 getVelocity() const
+        {
+            return velocity;
+        }
+
+        const float getQuantity() const
+        {
+            return quantity;
         }
     };
 
