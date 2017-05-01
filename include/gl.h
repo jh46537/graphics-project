@@ -1,14 +1,14 @@
 /*
- * mesh
+ * voxel
  */
-class Mesh
+class Voxel
 {
     GLuint vao;
     size_t index_size;
 
-
 public:
-    Mesh()
+
+    Voxel()
     {
         glGenVertexArrays(1, &vao);
         glBindVertexArray(vao);
@@ -36,17 +36,26 @@ public:
         glGenBuffers(1, &ibo);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices) * sizeof(GLuint), indices, GL_STATIC_DRAW);
-
     }
 
-    ~Mesh()
+    Voxel(Voxel&& that)
     {
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-        glBindVertexArray(0);
+        vao = that.vao;
+        index_size = that.index_size;
+        that.vao = 0;
+        that.index_size = 0;
     }
 
-    void render()
+    ~Voxel()
+    {
+        if (vao) {
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+            glBindVertexArray(0);
+        }
+    }
+
+    void render(const mat4& mvp) const
     {
         glBindBuffer(GL_ARRAY_BUFFER, vao);
 
@@ -59,7 +68,7 @@ public:
         glDisableVertexAttribArray(1);
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
-    }
+    };
 };
 
 
@@ -79,6 +88,11 @@ public:
             cerr << "[failed to create vertex shader program]" << endl;
             exit(-1);
         }
+    }
+
+    ~Shader()
+    {
+        glUseProgram(GL_NONE);
     }
 
     void add(size_t type, const char* file_name)
@@ -147,12 +161,17 @@ public:
         glUseProgram(program);
     }
 
-   void bind_attrib(const vector<const char*>& names)
-   {
-       for (size_t i = 0; i < names.size(); i++) {
+    GLint uniform(const char* name)
+    {
+        return glGetUniformLocation(program, name);
+    }
+
+    void bind_attrib(const vector<const char*>& names)
+    {
+        for (size_t i = 0; i < names.size(); i++) {
             glBindAttribLocation(program, i, names[i]);
-       }
-   }
+        }
+    }
 };
 
 
@@ -218,11 +237,21 @@ public:
         return !glfwWindowShouldClose(window);
     }
 
-    void render(Mesh& m)
+    void render(GLint mvp_id, const vector<Voxel>& voxels)
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        m.render();
+        //for (const auto& v: voxels) {
+        //    v.render();
+        //}
+        mat4 mvp{};
+
+        glUniformMatrix4fv(mvp_id, 1, GL_FALSE, glm::value_ptr(mvp));
+        voxels[0].render(mvp);
+
+        mvp = translate(mvp, vec3{-0.25, -0.25, 0.0});
+        glUniformMatrix4fv(mvp_id, 1, GL_FALSE, glm::value_ptr(mvp));
+        voxels[1].render(mvp);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
