@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 //#include <fstream>
 #include <vector>
@@ -21,7 +23,7 @@ using glm::mat4;
 //using glm::translate;
 
 
-#include "fluid.h"
+#include "grid.h"
 #include "gl.h"
 
 
