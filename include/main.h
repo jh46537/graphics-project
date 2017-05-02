@@ -42,11 +42,11 @@ const     char*  name   = "smoke";
 
 constexpr size_t dim_x = 100;
 constexpr size_t dim_y = 100;
-constexpr size_t dim_z = 1;
-constexpr double dx    = 1.0 / 120;
+constexpr size_t dim_z = 50;
+constexpr double dx    = 1.0 / 100;
 
 using clk                  = std::chrono::system_clock;
-constexpr uint64_t fps     = 1;
+constexpr uint64_t fps     = 3;
 constexpr uint64_t t_unit  = clk::period::den / clk::period::num;
 constexpr auto     t_frame = clk::duration(static_cast<uint64_t>((1.0 / fps) * t_unit));
 

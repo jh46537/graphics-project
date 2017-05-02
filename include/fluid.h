@@ -22,9 +22,12 @@ class Fluid
         {
             for (int j = 0; j < curGrid->yDim(); j++)
             {
-                Grid::Cell& cur = (*curGrid)(i,j,0);
-                vec3 pos = vec3(i,j,0) - cur.V * dt;
-                (*workingGrid)(i,j,0) = curGrid->bilerp(pos);
+                for (int k = 0; k < curGrid->zDim(); k++)
+                    {
+                        Grid::Cell& cur = (*curGrid)(i,j,k);
+                        vec3 pos = vec3(i,j,k) - vec3(0.02,-0.5,0.5) * 1.211f;
+                        (*workingGrid)(i,j,k) = curGrid->bilerp(pos);
+                    }
             }
         }
     }
@@ -52,6 +55,7 @@ public:
 
     void step(float dt)
     {
+        printf("wellistepped\n");
         advect(dt);
         swap();
     }
