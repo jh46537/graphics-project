@@ -83,6 +83,14 @@ public:
             setup(*this);
     }
 
+    Grid(const Grid& that)
+        : dim_x(that.dim_x), dim_y(that.dim_y), dim_z(that.dim_z), dx(that.dx)
+    {
+        cells.clear();
+        for (size_t i; i < that.size(); i++)
+            cells.push_back(that[i]);
+    }
+
     size_t size() const
     {
         return cells.size();
