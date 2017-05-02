@@ -16,10 +16,15 @@ int main(int argc, char** argv)
 
     function<void (Grid&)> setup = [] (Grid& g)
     {
-        for (size_t i = dim_x / 4; i < max<size_t>(dim_x * 3 / 4, 1); i++)
-            for (size_t j = dim_y / 4; j < max<size_t>(dim_y * 3 / 4, 1); j++)
-                for (size_t k = dim_z / 4; k < max<size_t>(dim_z * 3 / 4, 1); k++)
-                    g(i, j, k).quantity() = max_quantity;
+        for (size_t i = 0; i < dim_x; i++)
+            for (size_t j = 0; j < dim_y; j++)
+                for (size_t k = 0; k < dim_z; k++)
+                    if (i >= dim_x / 4 && i < max<size_t>(dim_x * 3 / 4, 1) &&
+                        j >= dim_y / 4 && j < max<size_t>(dim_y * 3 / 4, 1) &&
+                        k >= dim_z / 4 && k < max<size_t>(dim_z * 3 / 4, 1))
+                        g(i, j, k).quantity() = max_quantity - 1;
+                    else
+                        g(i, j, k).quantity() = max_quantity / 2 - 1;
     };
     Fluid sim{ vec3{ dim_x, dim_y, dim_z }, dx, setup};
 
@@ -32,12 +37,11 @@ int main(int argc, char** argv)
 
     while (w.alive()) {
         if (clk::now() > t_render) {
-            printf("wellirendered\n");
             t_render += t_frame;
             //auto t_start = clk::now();
             w.render(v, sim, mvp_loc, opc_loc, max_quantity);
             //auto t_end   = clk::now();
-            //cout << "[render after " << num_ticks << " simulations]" << endl;
+            cout << "[render after " << num_ticks << " simulations]" << endl;
             //cout << "[render took " << (t_end - t_start).count() << " ns]" << endl;
             dt = 1.0 / (fps * num_ticks);
             num_ticks = 0;

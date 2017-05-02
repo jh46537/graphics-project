@@ -44,6 +44,8 @@ public:
     {
         curGrid     = new Grid(dim, dx, setup);
         workingGrid = new Grid{ *curGrid };
+        curGrid->id     = 1;
+        workingGrid->id = 2;
     }
 
     ~Fluid()
@@ -56,7 +58,6 @@ public:
 
     void step(float dt)
     {
-        printf("wellistepped\n");
         advect(dt);
         swap();
     }

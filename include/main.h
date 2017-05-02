@@ -42,7 +42,7 @@ const     char*  name   = "smoke";
 
 constexpr size_t dim_x = 100;
 constexpr size_t dim_y = 100;
-constexpr size_t dim_z = 50;
+constexpr size_t dim_z = 5;
 constexpr double dx    = 1.0 / 100;
 
 using clk                  = std::chrono::system_clock;

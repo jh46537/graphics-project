@@ -72,6 +72,8 @@ private:
 
 public:
 
+    size_t id;
+
     Grid(const vec3& dim, const double dx, function<void (Grid&)> setup)
         : dim_x(dim.x), dim_y(dim.y), dim_z(dim.z), dx(dx)
     {
@@ -86,7 +88,7 @@ public:
                             , ((double)k - (dim_z / 2.0) + 0.5) * (2 * dx)
                             )
                             , vec3{ 0.0, 0.0, 0.0 }
-                            , 500.0
+                            , 0.0
                         }
                     );
                 }
@@ -97,12 +99,9 @@ public:
     }
 
     Grid(const Grid& that)
-        : dim_x(that.dim_x), dim_y(that.dim_y), dim_z(that.dim_z), dx(that.dx)
-    {
-        cells.clear();
-        for (size_t i; i < that.size(); i++)
-            cells.push_back(that[i]);
-    }
+        : dim_x(that.dim_x), dim_y(that.dim_y), dim_z(that.dim_z), dx(that.dx),
+          cells(that.cells)
+    {}
 
     size_t size() const
     {
@@ -116,7 +115,7 @@ public:
 
     Cell& operator()(size_t x, size_t y, size_t z)
     {
-        size_t index = x + y * dim_x + z * (dim_x * dim_y);
+        size_t index = x * (dim_y * dim_z) + y * dim_z + z;
         return cells[index];
     }
 
