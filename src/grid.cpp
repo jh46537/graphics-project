@@ -29,9 +29,9 @@ using glm::mix;
  */
 using Cell = Grid::Cell;
 
-Cell::Cell(vec3 V, double Q) : T(0), MVP(0), V(V), Q(Q) {};
+Cell::Cell(vec3 V, float Q) : T(0), MVP(0), V(V), Q(Q) {};
 
-Cell::Cell(const vec3 T, const mat4 MVP, vec3 V, double Q)
+Cell::Cell(const vec3 T, const mat4 MVP, vec3 V, float Q)
     : T(T), MVP(MVP), V(V), Q(Q) {};
 
 Cell::Cell(const Cell& that)
@@ -65,12 +65,12 @@ const vec3& Cell::velocity() const
     return V;
 }
 
-double& Cell::quantity()
+float& Cell::quantity()
 {
     return Q;
 }
 
-const double& Cell::quantity() const
+const float& Cell::quantity() const
 {
     return Q;
 }
@@ -79,16 +79,16 @@ const double& Cell::quantity() const
 /*
  * grid
  */
-Grid::Grid(const vec3& dim, const double dx, function<void (Grid&)> setup)
+Grid::Grid(const vec3& dim, const float dx, function<void (Grid&)> setup)
     : dim_x(dim.x), dim_y(dim.y), dim_z(dim.z), dx(dx)
 {
     for (size_t i = 0; i < dim_x; i++) {
         for (size_t j = 0; j < dim_y; j++) {
             for (size_t k = 0; k < dim_z; k++) {
                 vec3 T{
-                      ((double)i - (dim_x / 2.0) + 0.5) * (2 * dx)
-                    , ((double)j - (dim_y / 2.0) + 0.5) * (2 * dx)
-                    , ((double)k - (dim_z / 2.0) + 0.5) * (2 * dx)
+                      ((float)i - (dim_x / 2.0) + 0.5) * (2 * dx)
+                    , ((float)j - (dim_y / 2.0) + 0.5) * (2 * dx)
+                    , ((float)k - (dim_z / 2.0) + 0.5) * (2 * dx)
                 };
                 mat4 MVP{};
                 MVP = translate(MVP, T);
@@ -127,7 +127,7 @@ Cell& Grid::operator()(vec3 index)
     return (*this)(index.x, index.y, index.z);
 }
 
-//const double Grid::scale() const
+//const float Grid::scale() const
 //{
 //    return dx;
 //}

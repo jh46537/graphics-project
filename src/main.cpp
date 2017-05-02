@@ -31,7 +31,7 @@ int main(int argc, char** argv)
     /*
      * render loop
      */
-    double dt        = 1.0 / (fps * 10);
+    float dt         = 1.0 / (fps * 10);
     auto t_render    = clk::now();
     size_t num_ticks = 0;
 
@@ -51,7 +51,7 @@ int main(int argc, char** argv)
         sim.step(dt);
         //auto t_end   = clk::now();
 
-        ////dt = (t_end - t_start).count() / static_cast<double>(t_unit);
+        ////dt = (t_end - t_start).count() / static_cast<float>(t_unit);
         //cout << "[simulation took " << (t_end - t_start).count() << " ns]" << endl;
         num_ticks++;
     }

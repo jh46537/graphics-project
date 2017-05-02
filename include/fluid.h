@@ -40,7 +40,7 @@ class Fluid
 
 public:
 
-    Fluid(const vec3& dim, const double dx, function<void (Grid&)> setup)
+    Fluid(const vec3& dim, const float dx, function<void (Grid&)> setup)
     {
         curGrid     = new Grid(dim, dx, setup);
         workingGrid = new Grid{ *curGrid };

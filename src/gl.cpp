@@ -278,7 +278,7 @@ bool Window::alive() const
     return !glfwWindowShouldClose(window);
 }
 
-void Window::render(const Voxel& v, const Fluid& sim, const GLint mvp_loc, const GLint opc_loc, const double max_quantity) const
+void Window::render(const Voxel& v, const Fluid& sim, const GLint mvp_loc, const GLint opc_loc, const float max_quantity) const
 {
     const Grid& g = sim.getGrid();
 
