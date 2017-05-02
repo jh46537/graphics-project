@@ -8,19 +8,19 @@ using std::function;
 
 class Fluid
 {
+    Grid* curGrid;
+    Grid* workingGrid;
+
     void swap()
     {
         std::swap(curGrid, workingGrid);
     }
 
-    Grid* curGrid;
-    Grid* workingGrid;
-
     void advect(float dt)
     {
-        for (int i = 0; i < curGrid->xDim(); i++)
+        for (size_t i = 0; i < curGrid->xDim(); i++)
         {
-            for (int j = 0; j < curGrid->yDim(); j++)
+            for (size_t j = 0; j < curGrid->yDim(); j++)
             {
                 for (int k = 0; k < curGrid->zDim(); k++)
                     {
