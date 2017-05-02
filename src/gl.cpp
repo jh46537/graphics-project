@@ -77,6 +77,14 @@ Voxel::Voxel()
     glGenBuffers(1, &ibo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+
+    glBindBuffer(GL_ARRAY_BUFFER, vao);
+
+    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(0));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
 }
 
 Voxel::Voxel(Voxel&& that)
@@ -98,15 +106,15 @@ Voxel::~Voxel()
 
 void Voxel::render() const
 {
-    glBindBuffer(GL_ARRAY_BUFFER, vao);
+    //glBindBuffer(GL_ARRAY_BUFFER, vao);
 
-    glEnableVertexAttribArray(0);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(0));
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+    //glEnableVertexAttribArray(0);
+    //glEnableVertexAttribArray(1);
+    //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(0));
+    //glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
     glDrawElements(GL_TRIANGLES, index_size, GL_UNSIGNED_INT, 0);
-    glDisableVertexAttribArray(0);
-    glDisableVertexAttribArray(1);
+    //glDisableVertexAttribArray(0);
+    //glDisableVertexAttribArray(1);
 
     //glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -276,13 +284,13 @@ void Window::render(const Voxel& v, const Fluid& sim, const GLint mvp_loc, const
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    //for (size_t i = 0; i < g.size(); i++) {
-    //    mat4 mvp = g[i].mvp();
-    //    glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, glm::value_ptr(mvp));
-    //    float opacity = g[i].quantity() / max_quantity;
-    //    glUniform1f(opc_loc, (GLfloat)opacity);
-    //    v.render();
-    //}
+    for (size_t i = 0; i < g.size(); i++) {
+        mat4 mvp = g[i].mvp();
+        glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, glm::value_ptr(mvp));
+        float opacity = g[i].quantity() / max_quantity;
+        glUniform1f(opc_loc, (GLfloat)opacity);
+        v.render();
+    }
 
     glfwSwapBuffers(window);
     glfwPollEvents();

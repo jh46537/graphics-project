@@ -38,11 +38,11 @@ int main(int argc, char** argv)
     while (w.alive()) {
         if (clk::now() > t_render) {
             t_render += t_frame;
-            //auto t_start = clk::now();
+            auto t_start = clk::now();
             w.render(v, sim, mvp_loc, opc_loc, max_quantity);
-            //auto t_end   = clk::now();
+            auto t_end   = clk::now();
             cout << "[render after " << num_ticks << " simulations]" << endl;
-            //cout << "[render took " << (t_end - t_start).count() << " ns]" << endl;
+            cout << "[render took " << (t_end - t_start).count() << " ns]" << endl;
             dt = 1.0 / (fps * num_ticks);
             num_ticks = 0;
         }
