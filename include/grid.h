@@ -9,23 +9,27 @@ public:
 
     class Cell
     {
-        vec3 T;
+        const vec3 T;
+        const mat4 MVP;
 
     public:
         vec3   V;
         double Q;
 
-        Cell(vec3);
         Cell(vec3, double);
-        Cell(vec3, vec3, double);
+        Cell(const vec3, const mat4, vec3, double);
 
         Cell(const Cell&);
 
         Cell& operator=(const Cell&);
 
-        const vec3& translate() const;
+        //const vec3& translate() const;
+
+        const mat4 mvp() const;
 
         vec3& velocity();
+
+        const vec3& velocity() const;
 
         double& quantity();
 
@@ -34,10 +38,10 @@ public:
 
 private:
 
-    size_t dim_x;
-    size_t dim_y;
-    size_t dim_z;
-    double dx;
+    const size_t dim_x;
+    const size_t dim_y;
+    const size_t dim_z;
+    const double dx;
     Grid& self = *this;
 
     vector<Cell> cells;
@@ -58,11 +62,11 @@ public:
 
     Cell& operator()(vec3);
 
-    Cell bilerp(vec3) const;
-
-    const double scale() const;
+    //const double scale() const;
 
     const size_t xDim() const;
     const size_t yDim() const;
     const size_t zDim() const;
+
+    Cell bilerp(vec3) const;
 };

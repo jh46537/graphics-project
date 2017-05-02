@@ -16,10 +16,10 @@ using std::vector;
 #include <glm/gtc/matrix_transform.hpp>
 
 using glm::vec3;
-using glm::vec4;
+//using glm::vec4;
 using glm::mat4;
-using glm::translate;
-using glm::scale;
+//using glm::translate;
+//using glm::scale;
 
 
 #include "fluid.h"
@@ -276,15 +276,13 @@ void Window::render(const Voxel& v, const Fluid& sim, const GLint mvp_loc, const
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    for (size_t i = 0; i < g.size(); i++) {
-        mat4 mvp{};
-        mvp = translate(mvp, g[i].translate());
-        mvp = scale(mvp, vec3{ g.scale(), g.scale(), g.scale() });
-        glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, glm::value_ptr(mvp));
-        float opacity = g[i].quantity() / max_quantity;
-        glUniform1f(opc_loc, (GLfloat)opacity);
-        v.render();
-    }
+    //for (size_t i = 0; i < g.size(); i++) {
+    //    mat4 mvp = g[i].mvp();
+    //    glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, glm::value_ptr(mvp));
+    //    float opacity = g[i].quantity() / max_quantity;
+    //    glUniform1f(opc_loc, (GLfloat)opacity);
+    //    v.render();
+    //}
 
     glfwSwapBuffers(window);
     glfwPollEvents();
