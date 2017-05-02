@@ -45,9 +45,9 @@ constexpr size_t dim_y = 50;
 constexpr size_t dim_z = 1;
 constexpr double dx    = 1.0 / 60;
 
-constexpr uint64_t t_unit = 1'000'000'000;
-constexpr uint64_t fps    = 60;
-constexpr auto t_frame    = std::chrono::duration<int, std::ratio<1, t_unit>>(static_cast<uint64_t>(1.0 / fps * t_unit));
-using clk                 = std::chrono::high_resolution_clock;
+using clk                  = std::chrono::system_clock;
+constexpr uint64_t fps     = 1;
+constexpr uint64_t t_unit  = clk::period::den / clk::period::num;
+constexpr auto     t_frame = clk::duration(static_cast<uint64_t>((1.0 / fps) * t_unit));
 
 constexpr double   max_quantity = 1000;
