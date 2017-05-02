@@ -21,7 +21,8 @@ public:
         double Q;
 
         Cell(vec3 T) : T(T), V(0), Q(0) {};
-        Cell(vec3 T, double V, double Q) : T(T), V(V), Q(Q) {};
+        Cell(vec3 V, double Q) : T(0), V(V), Q(Q) {};
+        Cell(vec3 T, vec3 V, double Q) : T(T), V(V), Q(Q) {};
 
         Cell(const Cell& that)
         {
@@ -32,7 +33,7 @@ public:
 
         Cell& operator=(const Cell& that)
         {
-            T = that.T;
+            // does not overwrite T
             V = that.V;
             Q = that.Q;
             return *this;
@@ -84,7 +85,7 @@ public:
                             , ((double)j - (dim_y / 2.0) + 0.5) * (2 * dx)
                             , ((double)k - (dim_z / 2.0) + 0.5) * (2 * dx)
                             )
-                            , 0.0
+                            , vec3{ 0.0, 0.0, 0.0 }
                             , 500.0
                         }
                     );
@@ -124,7 +125,7 @@ public:
         return (*this)(index.x, index.y, index.z);
     }
 
-    Cell bilerp(vec3 index, vec3 pos)
+    Cell bilerp(vec3 pos)
     {
         int x1 = clamp(floor(pos.x), 0.0f, (float) dim_x - 1);
         int x2 = clamp(ceil(pos.x),  0.0f, (float) dim_x - 1);
@@ -133,20 +134,17 @@ public:
 
         float xamt = pos.x - x1;
         float yamt = pos.y - y1;
-        int myz = dim_z / 2;
+        int zamt = dim_z / 2;
 
-        vec3 lerp1_v = mix(self(x1,y1,myz).V, self(x2,y1,myz).V, xamt);
-        vec3 lerp2_v = mix(self(x1,y2,myz).V, self(x2,y2,myz).V, xamt);
+        vec3 lerp1_v = mix(self(x1,y1,zamt).V, self(x2,y1,zamt).V, xamt);
+        vec3 lerp2_v = mix(self(x1,y2,zamt).V, self(x2,y2,zamt).V, xamt);
         vec3 v = mix(lerp1_v, lerp2_v, yamt);
 
-        float lerp1_q = mix(self(x1,y1,myz).Q, self(x2,y1,myz).Q, xamt);
-        float lerp2_q = mix(self(x1,y2,myz).Q, self(x2,y2,myz).Q, xamt);
+        float lerp1_q = mix(self(x1,y1,zamt).Q, self(x2,y1,zamt).Q, xamt);
+        float lerp2_q = mix(self(x1,y2,zamt).Q, self(x2,y2,zamt).Q, xamt);
         float q = mix(lerp1_q, lerp2_q, yamt);
 
-        Cell cell = self(index);
-        cell.velocity() = v;
-        cell.quantity() = q;
-        return cell;
+        return Cell( v, q );
     }
 
     const double scale() const

@@ -24,10 +24,10 @@ class Fluid
             {
                 for (size_t k = 0; k < curGrid->zDim(); k++)
                     {
-                        Grid::Cell& cur = (*curGrid)(i,j,k);
+                        //Grid::Cell& cur = (*curGrid)(i,j,k);
                         vec3 pos = vec3(i,j,k) - vec3(0.02,-0.5,0.5) * 1.211f;
                         vec3 index{ i, j, k };
-                        (*workingGrid)(i,j,k) = curGrid->bilerp(index, pos);
+                        (*workingGrid)(i,j,k) = curGrid->bilerp(pos);
                     }
             }
         }
