@@ -272,8 +272,9 @@ bool Window::alive() const
 
 void Window::render(const Voxel& v, const Fluid& sim, GLint mvp_loc) const
 {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     const Grid& g = sim.getGrid();
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     for (size_t i = 0; i < g.size(); i++) {
         mat4 mvp{};

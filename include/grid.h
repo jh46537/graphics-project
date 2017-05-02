@@ -9,28 +9,28 @@ public:
 
     class Cell
     {
-        vec3 t;
+        vec3 T;
 
-        vec3 velocity;
-        float quantity;
+        vec3   V;
+        double Q;
 
     public:
 
-        Cell(vec3 t) : t(t) {};
+        Cell(vec3 T) : T(T) {};
 
-        const vec3 translate() const
+        const vec3& translate() const
         {
-            return t;
+            return T;
         }
 
-        const vec3 getVelocity() const
+        vec3& velocity()
         {
-            return velocity;
+            return V;
         }
 
-        const float getQuantity() const
+        double& quantity()
         {
-            return quantity;
+            return Q;
         }
     };
 
@@ -39,27 +39,30 @@ private:
     size_t dim_x;
     size_t dim_y;
     size_t dim_z;
-    double delta;
+    double dx;
 
     vector<Cell> cells;
 
 public:
 
-    Grid(const vec3& dim, const double delta)
-        : dim_x(dim.x), dim_y(dim.y), dim_z(dim.z), delta(delta)
+    Grid(const vec3& dim, const double dx, function<void (Grid&)> setup)
+        : dim_x(dim.x), dim_y(dim.y), dim_z(dim.z), dx(dx)
     {
         for (size_t i = 0; i < dim_x; i++) {
             for (size_t j = 0; j < dim_y; j++) {
                 for (size_t k = 0; k < dim_z; k++) {
-                    vec3 t{
-                          ((double)i - (dim_x / 2.0) + 0.5) * (2 * delta)
-                        , ((double)j - (dim_y / 2.0) + 0.5) * (2 * delta)
-                        , ((double)k - (dim_z / 2.0) + 0.5) * (2 * delta)
-                    };
-                    cells.push_back(Cell{t});
+                    cells.push_back(
+                        vec3 {
+                              ((double)i - (dim_x / 2.0) + 0.5) * (2 * dx)
+                            , ((double)j - (dim_y / 2.0) + 0.5) * (2 * dx)
+                            , ((double)k - (dim_z / 2.0) + 0.5) * (2 * dx)
+                        }
+                    );
                 }
             }
         }
+        if (setup)
+            setup(*this);
     }
 
     size_t size() const
@@ -72,19 +75,19 @@ public:
         return cells[i];
     }
 
-    const Cell& operator()(size_t x, size_t y, size_t  z) const
+    Cell& operator()(size_t x, size_t y, size_t  z)
     {
         size_t index = x * (dim_y * dim_z) + y * dim_z + z;
         return cells[index];
     }
 
-    const Cell& operator()(vec3 index) const
+    Cell& operator()(vec3 index)
     {
         return (*this)(index.x, index.y, index.z);
     }
 
     const double scale() const
     {
-        return delta;
+        return dx;
     }
 };

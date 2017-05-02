@@ -3,11 +3,15 @@
 #include <iostream>
 //#include <fstream>
 #include <vector>
+#include <functional>
+#include <chrono>
+#include <thread>
 
 using std::cout;
 using std::cerr;
 using std::endl;
 using std::vector;
+
 
 
 #include <GL/gl3w.h>
@@ -36,7 +40,14 @@ constexpr size_t width  = 800;
 constexpr size_t height = 800;
 const     char*  name   = "smoke";
 
-constexpr size_t dim_x  = 50;
-constexpr size_t dim_y  = 50;
-constexpr size_t dim_z  = 1;
-constexpr double delta  = 1.0/60;
+constexpr size_t dim_x = 50;
+constexpr size_t dim_y = 50;
+constexpr size_t dim_z = 1;
+constexpr double dx    = 1.0 / 60;
+
+constexpr uint64_t t_unit = 1'000'000'000;
+constexpr uint64_t fps    = 60;
+constexpr auto t_frame    = std::chrono::duration<int, std::ratio<1, t_unit>>(static_cast<uint64_t>(1.0 / fps * t_unit));
+using clk                 = std::chrono::high_resolution_clock;
+
+constexpr double   max_quantity = 1000;

@@ -1,39 +1,48 @@
 #pragma once
 
+#include <functional>
+#include <algorithm>
+using std::function;
+
 #include "grid.h"
 
 class Fluid
 {
-    void swap(Grid **working_grid, Grid **grid)
+    void swap()
     {
-        Grid *tmp_grid = *working_grid;
-        *working_grid = *grid;
-        *grid = tmp_grid;
+        std::swap(curGrid, workingGrid);
     }
 
-    Grid grid1, grid2;
-    Grid *curGrid, *workingGrid;
+    Grid* curGrid;
+    Grid* workingGrid;
+
+    void advect(double dt)
+    {
+
+    }
+
+    void project(double dt)
+    {
+
+    }
 
 public:
-    Fluid(const vec3& dim, const double delta)
-      : grid1(dim, delta), grid2(dim, delta),
-        curGrid(&grid1), workingGrid(&grid2)
+
+    Fluid(const vec3& dim, const double dx, function<void (Grid&)> setup)
     {
+        curGrid     = new Grid(dim, dx, setup);
+        workingGrid = new Grid(dim, dx, nullptr);
+    }
+
+    ~Fluid()
+    {
+        delete(curGrid);
+        delete(workingGrid);
     }
 
     const Grid& getGrid() const { return *curGrid; }
 
-    void step(float dt)
-    {
-
-    }
-
-    void advect(float dt)
-    {
-
-    }
-
-    void project(float dt)
+    void step(double dt)
     {
 
     }
