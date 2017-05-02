@@ -112,7 +112,6 @@ public:
         return (*this)(index.x, index.y, index.z);
     }
 
-
     Cell bilerp(vec3 pos)
     {
         float x1 = clamp(floor(pos.x), 0.0f, (float) dim_x - 1);
