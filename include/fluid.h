@@ -22,11 +22,12 @@ class Fluid
         {
             for (size_t j = 0; j < curGrid->yDim(); j++)
             {
-                for (int k = 0; k < curGrid->zDim(); k++)
+                for (size_t k = 0; k < curGrid->zDim(); k++)
                     {
                         Grid::Cell& cur = (*curGrid)(i,j,k);
                         vec3 pos = vec3(i,j,k) - vec3(0.02,-0.5,0.5) * 1.211f;
-                        (*workingGrid)(i,j,k) = curGrid->bilerp(pos);
+                        vec3 index{ i, j, k };
+                        (*workingGrid)(i,j,k) = curGrid->bilerp(index, pos);
                     }
             }
         }

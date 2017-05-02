@@ -21,11 +21,18 @@ public:
         double Q;
 
         Cell(vec3 T) : T(T), V(0), Q(0) {};
-        Cell(vec3 V, double Q) : V(V), Q(Q) {};
-        Cell(vec3 T, double nope, double Q) : T(T), V(0), Q(Q) {};
+        Cell(vec3 T, double V, double Q) : T(T), V(V), Q(Q) {};
 
-        Cell& operator=(Cell const & that)
+        Cell(const Cell& that)
         {
+            T = that.T;
+            V = that.V;
+            Q = that.Q;
+        }
+
+        Cell& operator=(const Cell& that)
+        {
+            T = that.T;
             V = that.V;
             Q = that.Q;
             return *this;
@@ -71,11 +78,15 @@ public:
             for (size_t j = 0; j < dim_y; j++) {
                 for (size_t k = 0; k < dim_z; k++) {
                     cells.push_back(
-                        {vec3 (
+                        Cell{
+                            vec3 (
                               ((double)i - (dim_x / 2.0) + 0.5) * (2 * dx)
                             , ((double)j - (dim_y / 2.0) + 0.5) * (2 * dx)
                             , ((double)k - (dim_z / 2.0) + 0.5) * (2 * dx)
-                            ), 0.0, 500.0}
+                            )
+                            , 0.0
+                            , 500.0
+                        }
                     );
                 }
             }
@@ -113,13 +124,12 @@ public:
         return (*this)(index.x, index.y, index.z);
     }
 
-    Cell bilerp(vec3 pos)
+    Cell bilerp(vec3 index, vec3 pos)
     {
         int x1 = clamp(floor(pos.x), 0.0f, (float) dim_x - 1);
         int x2 = clamp(ceil(pos.x),  0.0f, (float) dim_x - 1);
         int y1 = clamp(floor(pos.y), 0.0f, (float) dim_y - 1);
         int y2 = clamp(ceil(pos.y),  0.0f, (float) dim_y - 1);
-        
 
         float xamt = pos.x - x1;
         float yamt = pos.y - y1;
@@ -133,7 +143,10 @@ public:
         float lerp2_q = mix(self(x1,y2,myz).Q, self(x2,y2,myz).Q, xamt);
         float q = mix(lerp1_q, lerp2_q, yamt);
 
-        return Cell(v, q);
+        Cell cell = self(index);
+        cell.velocity() = v;
+        cell.quantity() = q;
+        return cell;
     }
 
     const double scale() const

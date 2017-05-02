@@ -16,10 +16,6 @@ int main(int argc, char** argv)
 
     function<void (Grid&)> setup = [] (Grid& g)
     {
-        for (size_t i = 0; i < max<size_t>(dim_x, 1); i++)
-            for (size_t j = 0; j < max<size_t>(dim_y, 1); j++)
-                for (size_t k = 0; k < max<size_t>(dim_z, 1); k++)
-                    g(i, j, k).quantity() = 0.0;
         for (size_t i = dim_x / 4; i < max<size_t>(dim_x * 3 / 4, 1); i++)
             for (size_t j = dim_y / 4; j < max<size_t>(dim_y * 3 / 4, 1); j++)
                 for (size_t k = dim_z / 4; k < max<size_t>(dim_z * 3 / 4, 1); k++)
