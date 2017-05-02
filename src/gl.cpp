@@ -51,7 +51,7 @@ Voxel::Voxel()
     GLuint vbo;
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices) * sizeof(vec3), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
     GLuint indices[] = {
           0, 1, 2
@@ -72,11 +72,11 @@ Voxel::Voxel()
         , 5, 4, 7
         , 7, 4, 6
     };
-    index_size = sizeof(indices);
+    index_size = sizeof(indices) / sizeof(GLuint);
     GLuint ibo;
     glGenBuffers(1, &ibo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices) * sizeof(GLuint), indices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 }
 
 Voxel::Voxel(Voxel&& that)
