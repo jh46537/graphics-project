@@ -49,5 +49,5 @@ public:
     Window(size_t, size_t, size_t, size_t, const char*);
     ~Window();
     bool alive() const;
-    void render(const Voxel&, const Fluid&, GLint) const;
+    void render(const Voxel&, const Fluid&, const GLint, const GLint, const double) const;
 };

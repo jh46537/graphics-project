@@ -11,7 +11,7 @@ using std::cout;
 using std::cerr;
 using std::endl;
 using std::vector;
-
+using std::max;
 
 
 #include <GL/gl3w.h>
@@ -40,10 +40,10 @@ constexpr size_t width  = 800;
 constexpr size_t height = 800;
 const     char*  name   = "smoke";
 
-constexpr size_t dim_x = 50;
-constexpr size_t dim_y = 50;
+constexpr size_t dim_x = 100;
+constexpr size_t dim_y = 100;
 constexpr size_t dim_z = 1;
-constexpr double dx    = 1.0 / 60;
+constexpr double dx    = 1.0 / 120;
 
 using clk                  = std::chrono::system_clock;
 constexpr uint64_t fps     = 1;

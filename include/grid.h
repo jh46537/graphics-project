@@ -20,7 +20,7 @@ public:
         vec3   V;
         double Q;
 
-        Cell(vec3 T) : T(T) {};
+        Cell(vec3 T) : T(T), V(0), Q(0) {};
         Cell(vec3 V, double Q) : V(V), Q(Q) {};
 
         Cell& operator=(Cell const & that)
@@ -41,6 +41,11 @@ public:
         }
 
         double& quantity()
+        {
+            return Q;
+        }
+
+        const double& quantity() const
         {
             return Q;
         }
@@ -88,9 +93,9 @@ public:
         return cells[i];
     }
 
-    Cell& operator()(size_t x, size_t y, size_t  z)
+    Cell& operator()(size_t x, size_t y, size_t z)
     {
-        size_t index = x * (dim_y * dim_z) + y * dim_z + z;
+        size_t index = x + y * dim_x + z * (dim_x * dim_y);
         return cells[index];
     }
 

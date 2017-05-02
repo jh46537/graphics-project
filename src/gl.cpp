@@ -270,7 +270,7 @@ bool Window::alive() const
     return !glfwWindowShouldClose(window);
 }
 
-void Window::render(const Voxel& v, const Fluid& sim, GLint mvp_loc) const
+void Window::render(const Voxel& v, const Fluid& sim, const GLint mvp_loc, const GLint opc_loc, const double max_quantity) const
 {
     const Grid& g = sim.getGrid();
 
@@ -281,6 +281,8 @@ void Window::render(const Voxel& v, const Fluid& sim, GLint mvp_loc) const
         mvp = translate(mvp, g[i].translate());
         mvp = scale(mvp, vec3{ g.scale(), g.scale(), g.scale() });
         glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, glm::value_ptr(mvp));
+        float opacity = g[i].quantity() / max_quantity;
+        glUniform1f(opc_loc, (GLfloat)opacity);
         v.render();
     }
 
