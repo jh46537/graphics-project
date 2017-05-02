@@ -16,12 +16,20 @@ class Fluid
     Grid* curGrid;
     Grid* workingGrid;
 
-    void advect(double dt)
+    void advect(float dt)
     {
-
+        for (int i = 0; i < curGrid->xDim(); i++)
+        {
+            for (int j = 0; j < curGrid->yDim(); j++)
+            {
+                Grid::Cell& cur = (*curGrid)(i,j,0);
+                vec3 pos = vec3(i,j,0) - cur.V * dt;
+                (*workingGrid)(i,j,0) = curGrid->bilerp(pos);
+            }
+        }
     }
 
-    void project(double dt)
+    void project(float dt)
     {
 
     }
@@ -42,8 +50,9 @@ public:
 
     const Grid& getGrid() const { return *curGrid; }
 
-    void step(double dt)
+    void step(float dt)
     {
-
+        advect(dt);
+        swap();
     }
 };
