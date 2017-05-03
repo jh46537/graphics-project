@@ -8,6 +8,10 @@ class Fluid
     Grid* curGrid;
     Grid* workingGrid;
 
+    using float3 = vector<vector<vector<float>>>;
+    float3 p;
+    float3 q;
+
     void swap();
 
     void advect(const float);

@@ -31,6 +31,12 @@ Fluid::Fluid(const vec3& dim, const float dx, function<void (Grid&)> setup)
     workingGrid = new Grid{ *curGrid };
     curGrid->id     = 1;
     workingGrid->id = 2;
+
+    const size_t X = dim.x;
+    const size_t Y = dim.y;
+    const size_t Z = dim.z;
+    p = float3(X, vector<vector<float>>(Y, vector<float>(Z, 0.0f)));
+    q = p;
 }
 
 Fluid::~Fluid()
@@ -48,8 +54,8 @@ void Fluid::step(const float dt)
 {
     advect(dt);
     swap();
-    //project(dt);
-    //swap();
+    project(dt);
+    swap();
 }
 
 void Fluid::swap()
@@ -111,8 +117,6 @@ void Fluid::project(const float dt)
     g.calc_divergence();
 
     /* Laplace - Jacobi iteration */
-    float p[100][100][1] = { 0.0f };
-    float q[100][100][1] = { 0.0f };
     for (size_t n = 0; n < convergence; ++n) {
         // single iteration
         for (size_t k = 0; k < Z; ++k) {
