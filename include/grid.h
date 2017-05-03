@@ -52,7 +52,7 @@ public:
     size_t size() const;
     const Cell& operator[](size_t) const;
     Cell& operator()(size_t, size_t, size_t);
-    Cell& operator()(vec3);
+    Cell& operator()(uvec3);
 
     //const float scale() const;
     const size_t xDim() const;

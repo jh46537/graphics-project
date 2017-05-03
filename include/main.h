@@ -11,6 +11,7 @@ using std::cout;
 using std::cerr;
 using std::endl;
 using std::vector;
+using std::function;
 using std::max;
 
 
@@ -22,10 +23,12 @@ using std::max;
 //#include <glm/gtc/matrix_transform.hpp>
 
 using glm::vec3;
+using glm::uvec3;
 using glm::vec4;
 using glm::mat4;
 //using glm::translate;
 
+#include "grid.h"
 #include "fluid.h"
 #include "gl.h"
 

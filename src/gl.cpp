@@ -1,10 +1,12 @@
 #include <iostream>
 #include <fstream>
+#include <functional>
 #include <vector>
 
 using std::cout;
 using std::cerr;
 using std::endl;
+using std::function;
 using std::vector;
 
 
@@ -16,14 +18,12 @@ using std::vector;
 #include <glm/gtc/matrix_transform.hpp>
 
 using glm::vec3;
-//using glm::vec4;
+using glm::uvec3;
 using glm::mat4;
-//using glm::translate;
-//using glm::scale;
 
 
-#include "fluid.h"
 #include "grid.h"
+#include "fluid.h"
 #include "gl.h"
 
 

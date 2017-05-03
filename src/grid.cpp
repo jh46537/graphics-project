@@ -13,6 +13,7 @@ using std::function;
 #include <glm/gtc/matrix_transform.hpp>
 
 using glm::vec3;
+using glm::uvec3;
 using glm::mat4;
 using glm::translate;
 using glm::scale;
@@ -122,7 +123,7 @@ Cell& Grid::operator()(size_t x, size_t y, size_t z)
     return cells[index];
 }
 
-Cell& Grid::operator()(vec3 index)
+Cell& Grid::operator()(uvec3 index)
 {
     return (*this)(index.x, index.y, index.z);
 }
@@ -149,22 +150,22 @@ const size_t Grid::zDim() const
 
 Cell Grid::bilerp(vec3 pos) const
 {
-    int x1 = clamp(floor(pos.x), 0.0f, (float) dim_x - 1);
-    int x2 = clamp(ceil(pos.x),  0.0f, (float) dim_x - 1);
-    int y1 = clamp(floor(pos.y), 0.0f, (float) dim_y - 1);
-    int y2 = clamp(ceil(pos.y),  0.0f, (float) dim_y - 1);
+    size_t x1 = clamp(floor(pos.x), 0.0f, float(dim_x - 1));
+    size_t x2 = clamp(ceil (pos.x), 0.0f, float(dim_x - 1));
+    size_t y1 = clamp(floor(pos.y), 0.0f, float(dim_y - 1));
+    size_t y2 = clamp(ceil (pos.y), 0.0f, float(dim_y - 1));
 
-    float xamt = pos.x - x1;
-    float yamt = pos.y - y1;
-    int zamt = dim_z / 2;
+    float x_amt = pos.x - x1;
+    float y_amt = pos.y - y1;
+    size_t z    = dim_z / 2;
 
-    vec3 lerp1_v = mix(self(x1,y1,zamt).V, self(x2,y1,zamt).V, xamt);
-    vec3 lerp2_v = mix(self(x1,y2,zamt).V, self(x2,y2,zamt).V, xamt);
-    vec3 v = mix(lerp1_v, lerp2_v, yamt);
+    vec3 v_x1 = mix(self(x1, y1, z).V, self(x2, y1, z).V, x_amt);
+    vec3 v_x2 = mix(self(x1, y2, z).V, self(x2, y2, z).V, x_amt);
+    vec3 v    = mix(v_x1, v_x2, y_amt);
 
-    float lerp1_q = mix(self(x1,y1,zamt).Q, self(x2,y1,zamt).Q, xamt);
-    float lerp2_q = mix(self(x1,y2,zamt).Q, self(x2,y2,zamt).Q, xamt);
-    float q = mix(lerp1_q, lerp2_q, yamt);
+    float q_x1 = mix(self(x1, y1, z).Q, self(x2, y1, z).Q, x_amt);
+    float q_x2 = mix(self(x1, y2, z).Q, self(x2, y2, z).Q, x_amt);
+    float q    = mix(q_x1, q_x2, y_amt);
 
     return Cell( v, q );
 }
