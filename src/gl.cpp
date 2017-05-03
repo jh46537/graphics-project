@@ -223,7 +223,7 @@ GLint Shader::uniform(const char* name) const
 
 void Shader::bind_attrib(const vector<const char*>& names) const
 {
-    for (size_t i = 0; i < names.size(); i++) {
+    for (size_t i = 0; i < names.size(); ++i) {
         glBindAttribLocation(program, i, names[i]);
     }
 }
@@ -297,7 +297,7 @@ void Window::render(const Voxel& v, const Fluid& sim, const GLint mvp_loc, const
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    for (size_t i = 0; i < g.size(); i++) {
+    for (size_t i = 0; i < g.size(); ++i) {
         mat4 mvp = g[i].mvp();
         glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, glm::value_ptr(mvp));
         float opacity = g[i].quantity() / max_quantity;

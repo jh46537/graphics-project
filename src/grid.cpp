@@ -77,6 +77,16 @@ const float& Cell::quantity() const
     return Q;
 }
 
+//float& Cell::divergence()
+//{
+//    return D;
+//}
+
+//const float& Cell::divergence() const
+//{
+//    return D;
+//}
+
 
 /*
  * grid
@@ -84,9 +94,9 @@ const float& Cell::quantity() const
 Grid::Grid(const vec3& dim, const float dx, function<void (Grid&)> setup)
     : dim_x(dim.x), dim_y(dim.y), dim_z(dim.z), dx(dx)
 {
-    for (size_t i = 0; i < dim_x; i++) {
-        for (size_t j = 0; j < dim_y; j++) {
-            for (size_t k = 0; k < dim_z; k++) {
+    for (size_t i = 0; i < dim_x; ++i) {
+        for (size_t j = 0; j < dim_y; ++j) {
+            for (size_t k = 0; k < dim_z; ++k) {
                 vec3 T{
                       ((float)i - (dim_x / 2.0) + 0.5) * (2 * dx)
                     , ((float)j - (dim_y / 2.0) + 0.5) * (2 * dx)
@@ -129,10 +139,10 @@ Cell& Grid::operator()(uvec3 index)
     return (*this)(index.x, index.y, index.z);
 }
 
-//const float Grid::scale() const
-//{
-//    return dx;
-//}
+const float Grid::getDx() const
+{
+    return dx;
+}
 
 const size_t Grid::xDim() const
 {
@@ -169,4 +179,34 @@ Cell Grid::bilerp(vec3 pos) const
     float q    = mix(q_x1, q_x2, y_amt);
 
     return Cell( v, q );
+}
+
+void Grid::calc_divergence()
+{
+    for (size_t k = 0; k < dim_z; ++k) {
+        // inner cells
+        for (size_t i = 1; i < dim_x - 1; ++i) {
+            for (size_t j = 1; j < dim_y - 1; ++j) {
+                self(i, j, k).D = ((self(i + 1, j    , k).V.x - self(i, j, k).V.x)
+                                 + (self(i    , j + 1, k).V.y - self(i, j, k).V.y)) / dx;
+            }
+        }
+
+        // edge cells
+        for (size_t i = 1; i < dim_x - 1; ++i) {
+            self(i, 0        , k).D = self(i, 1        , k).D;
+            self(i, dim_y - 1, k).D = self(i, dim_y - 2, k).D;
+        }
+
+        for (size_t j = 1; j < dim_y - 1; ++j) {
+            self(0        , j, k).D = self(1        , j, k).D;
+            self(dim_x - 1, j, k).D = self(dim_x - 2, j, k).D;
+        }
+
+        // corner cells
+        self(0        , 0        , k).D = self(1        , 1        , k).D;
+        self(0        , dim_y - 1, k).D = self(1        , dim_y - 2, k).D;
+        self(dim_x - 1, 0        , k).D = self(dim_x - 2, 1        , k).D;
+        self(dim_x - 1, dim_y - 1, k).D = self(dim_x - 2, dim_y - 2, k).D;
+    }
 }

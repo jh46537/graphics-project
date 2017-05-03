@@ -21,9 +21,9 @@ int main(int argc, char** argv)
      */
     function<void (Grid&)> setup = [] (Grid& g)
     {
-        for (size_t i = 0; i < dim_x; i++) {
-            for (size_t j = 0; j < dim_y; j++) {
-                for (size_t k = 0; k < dim_z; k++) {
+        for (size_t i = 0; i < dim_x; ++i) {
+            for (size_t j = 0; j < dim_y; ++j) {
+                for (size_t k = 0; k < dim_z; ++k) {
                     if (i >= dim_x / 4 && i < max<size_t>(dim_x * 3 / 4, 1) &&
                         j >= dim_y / 4 && j < max<size_t>(dim_y * 3 / 4, 1) &&
                         k >= dim_z / 4 && k < max<size_t>(dim_z * 3 / 4, 1)) {
@@ -44,7 +44,7 @@ int main(int argc, char** argv)
      */
     float dt;
     auto t_render    = clk::now();
-    size_t num_ticks = 10;
+    size_t num_ticks = 10;          // initialize > 0
 
     while (w.alive()) {
         if (clk::now() > t_render) {
@@ -64,7 +64,7 @@ int main(int argc, char** argv)
 
         ////dt = (t_end - t_start).count() / static_cast<float>(t_unit);
         //cout << "[simulation took " << (t_end - t_start).count() << " ns]" << endl;
-        num_ticks++;
+        ++num_ticks;
     }
 
     return 0;
