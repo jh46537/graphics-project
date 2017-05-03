@@ -59,14 +59,51 @@ void Fluid::advect(const float dt)
     Grid& g = *curGrid;
     Grid& h = *workingGrid;
 
-    for (size_t i = 0; i < g.xDim(); i++)
+    const size_t X = g.xDim();
+    const size_t Y = g.yDim();
+    const size_t Z = g.zDim();
+
+    for (size_t i = 0; i < X; i++)
     {
-        for (size_t j = 0; j < g.yDim(); j++)
+        for (size_t j = 0; j < Y; j++)
         {
-            for (size_t k = 0; k < g.zDim(); k++)
+            for (size_t k = 0; k < Z; k++)
             {
-                vec3 pos = vec3(i,j,k) - vec3(0.02,-0.5,0.5) * 1.211f;
+                vec3 pos = vec3(i, j, k) - vec3(0.02, -0.50, 0.50) * 1.211f;
+                //vec3 pos = vec3(i, j, k) - g(i, j, k).V * dt;
                 (*workingGrid)(i,j,k) = curGrid->bilerp(pos);
+
+                ///* advect */
+                //vec3 pos = vec3(i, j, k) - g(i, j, k).V * dt;
+                //h(i, j, k) = g.bilerp(pos);
+
+                //// corner cases
+                //if (i == 0 || i == X - 1 ||
+                //    j == 0 || j == Y - 1) {
+                //    if ((i == 0 || i == X - 1) &&
+                //        (j == 0 || j == Y - 1)) {
+                //        if (i == 0 && j == 0)
+                //            h(i, j, k).V = -1.0f * (g(i + 1, j, k).V + g(i, j + 1, k).V) / 2.0f;
+                //        else if (i == 0 && j == Y - 1)
+                //            h(i, j, k).V = -1.0f * (g(i + 1, j, k).V + g(i, j - 1, k).V) / 2.0f;
+                //        else if (i == X - 1 && j == 0)
+                //            h(i, j, k).V = -1.0f * (g(i - 1, j, k).V + g(i, j + 1, k).V) / 2.0f;
+                //        else
+                //            h(i, j, k).V = -1.0f * (g(i - 1, j, k).V + g(i, j - 1, k).V) / 2.0f;
+                //    }
+                //    else if (i == 0 || i == X - 1) {
+                //        if (i == 0)
+                //            h(i, j, k).V = -1.0f * g(i + 1, j, k).V;
+                //        else
+                //            h(i, j, k).V = -1.0f * g(i - 1, j, k).V;
+                //    }
+                //    else {
+                //        if (j == 0)
+                //            h(i, j, k).V = -1.0f * g(i, j + 1, k).V;
+                //        else
+                //            h(i, j, k).V = -1.0f * g(i, j - 1, k).V;
+                //    }
+                //}
             }
         }
     }

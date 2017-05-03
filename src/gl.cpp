@@ -38,6 +38,13 @@ Voxel::Voxel()
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
 
+    //constexpr float irt3 = 1.0f / sqrt(3);
+    //vec3 vertices[] = {
+    //      vec3{ 0.0f , -irt3 / 2, irt3     } * 2.0f, vec3{1.0f, 1.0f, 1.0f}
+    //    , vec3{ -0.5f, -irt3 / 2, -irt3 / 2} * 2.0f, vec3{1.0f, 0.0f, 0.0f}
+    //    , vec3{ 0.5f , -irt3 / 2, -irt3 / 2} * 2.0f, vec3{0.0f, 1.0f, 0.0f}
+    //    , vec3{ 0.0f , irt3     , 0.0f     } * 2.0f, vec3{0.0f, 0.0f, 1.0f}
+    //};
     vec3 vertices[] = {
           vec3{ -1.0f, -1.0f, -1.0f }, vec3{ 1.0f, 1.0f, 1.0f }
         , vec3{  1.0f, -1.0f, -1.0f }, vec3{ 1.0f, 1.0f, 1.0f }
@@ -53,6 +60,12 @@ Voxel::Voxel()
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
+    //GLuint indices[] = {
+    //      0, 1, 2
+    //    , 0, 2, 3
+    //    , 0, 3, 1
+    //    , 1, 3, 2
+    //};
     GLuint indices[] = {
           0, 1, 2
         , 2, 1, 3

@@ -14,6 +14,11 @@ int main(int argc, char** argv)
     GLint mvp_loc = s.uniform("mvp");
     GLint opc_loc = s.uniform("opacity");
 
+    /*
+     * x: -1 (left) -> 1 (right)
+     * y: -1 (down) -> 1 (up)
+     * z: -1 (out of screen) -> 1 (into screen)
+     */
     function<void (Grid&)> setup = [] (Grid& g)
     {
         for (size_t i = 0; i < dim_x; i++)
@@ -21,10 +26,13 @@ int main(int argc, char** argv)
                 for (size_t k = 0; k < dim_z; k++)
                     if (i >= dim_x / 4 && i < max<size_t>(dim_x * 3 / 4, 1) &&
                         j >= dim_y / 4 && j < max<size_t>(dim_y * 3 / 4, 1) &&
-                        k >= dim_z / 4 && k < max<size_t>(dim_z * 3 / 4, 1))
-                        g(i, j, k).quantity() = max_quantity - 1;
-                    else
-                        g(i, j, k).quantity() = max_quantity / 2 - 1;
+                        k >= dim_z / 4 && k < max<size_t>(dim_z * 3 / 4, 1)) {
+                        g(i, j, k).quantity() = max_quantity;
+                        g(i, j, k).velocity() = vec3{ 0.0f, 1.0f, 0.0f };
+                    }
+                    else {
+                        g(i, j, k).quantity() = max_quantity / 2;
+                    }
     };
     Fluid sim{ vec3{ dim_x, dim_y, dim_z }, dx, setup};
 

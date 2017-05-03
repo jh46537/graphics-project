@@ -18,15 +18,12 @@ using std::max;
 #include <GL/gl3w.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
-//#define GLM_FORCE_RADIANS
-//#include <glm/gtc/type_ptr.hpp>
-//#include <glm/gtc/matrix_transform.hpp>
 
 using glm::vec3;
 using glm::uvec3;
 using glm::vec4;
 using glm::mat4;
-//using glm::translate;
+
 
 #include "grid.h"
 #include "fluid.h"
