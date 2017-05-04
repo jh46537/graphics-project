@@ -289,7 +289,7 @@ void Camera::in(bool slow)
 void Camera::out(bool slow)
 {
     float dr = speed_r * (slow ? speed_div : 1.0);
-    if (R + dr < 100)
+    if (R + dr < 5)
         R += dr;
 }
 
@@ -347,6 +347,10 @@ Window::Window(
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+    glFrontFace(GL_CCW);
 }
 
 Window::~Window()
