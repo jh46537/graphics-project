@@ -42,7 +42,7 @@ int main(int argc, char** argv)
     /*
      * render loop
      */
-    float dt;
+    float dt         = 1.0f;
     auto t_render    = clk::now();
     size_t num_ticks = 10;          // initialize > 0
 

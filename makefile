@@ -3,7 +3,7 @@ INCD = include
 OBJD = build
 
 CC = g++
-CFLG = -std=c++14 -g -Wall
+CFLG = -std=c++14 -g -O3 -Wall
 INCS = -Iinclude
 LFLG =
 LIBS = -lglfw -ldl
