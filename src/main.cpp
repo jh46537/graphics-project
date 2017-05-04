@@ -2,7 +2,7 @@
 
 int main(int argc, char** argv)
 {
-    Window w{ version_major, version_minor, width, height, name };
+    Window w{ version_major, version_minor, width, height, name, dr, dt, dp };
 
     Voxel v;
 

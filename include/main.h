@@ -40,6 +40,10 @@ constexpr size_t width  = 800;
 constexpr size_t height = 800;
 const     char*  name   = "smoke";
 
+constexpr float dr = 0.05f;
+constexpr float dt = 0.01f;
+constexpr float dp = 0.01f;
+
 constexpr size_t dim_x = 100;
 constexpr size_t dim_y = 100;
 constexpr size_t dim_z = 1;
@@ -47,7 +51,7 @@ constexpr float dx     = 1.0 / 100;
 
 using clk                  = std::chrono::system_clock;
 constexpr uint64_t fps     = 30;
-constexpr uint64_t t_unit  = 1.0;//clk::period::den / clk::period::num;
+constexpr uint64_t t_unit  = clk::period::den / clk::period::num;
 constexpr auto     t_frame = clk::duration(static_cast<uint64_t>((1.0 / fps) * t_unit));
 
 constexpr float max_quantity = 1000;

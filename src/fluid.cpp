@@ -182,8 +182,7 @@ void Fluid::project(const float dt)
                           p[i][j][k] - p[i - 1][j    ][k]
                         , p[i][j][k] - p[i    ][j - 1][k]
                         , 0.0f
-                    } /
-                dx;
+                    } / dx;
             }
         }
     }
