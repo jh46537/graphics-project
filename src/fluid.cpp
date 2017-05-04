@@ -53,9 +53,23 @@ const Grid& Fluid::getGrid() const
 void Fluid::step(const float dt)
 {
     advect(dt);
-    swap();
     project(dt);
-    swap();
+
+    // Create conditions for nice looking simulation =)
+    for (size_t i = 0; i < 100; ++i) {
+        for (size_t j = 0; j < 100; ++j) {
+            vec3 pos = vec3(i, j, 0) - (*curGrid)(i, j, 0).V * dt;
+            (*curGrid)(i, j, 0).Q = (*curGrid).bilerp(pos).Q;
+        }
+    }
+    for (size_t i = 45; i < 55; i++) {
+      for (size_t j = 45; j < 50; j++) {
+          (*curGrid)(i, j, 0).V += vec3{0.0f, -18.0f, 0.0f};
+      }
+      for (size_t j = 50; j < 55; j++) {
+          (*curGrid)(i, j, 0).V += vec3{0.0f, 18.0f, 0.0f};
+      }
+    }
 }
 
 void Fluid::swap()
@@ -84,29 +98,29 @@ void Fluid::advect(const float dt)
 
         // edge cells
         for (size_t i = 1; i < X - 1; ++i) {
-            h(i, 0    , k).V = -1.0f * g(i, 1    , k).V;
-            h(i, Y - 1, k).V = -1.0f * g(i, Y - 2, k).V;
+            h(i, 0    , k).V = -1.0f * h(i, 1    , k).V;
+            h(i, Y - 1, k).V = -1.0f * h(i, Y - 2, k).V;
         }
 
         for (size_t j = 1; j < Y - 1; ++j) {
-            h(0    , j, k).V = -1.0f * g(1    , j, k).V;
-            h(X - 1, j, k).V = -1.0f * g(X - 2, j, k).V;
+            h(0    , j, k).V = -1.0f * h(1    , j, k).V;
+            h(X - 1, j, k).V = -1.0f * h(X - 2, j, k).V;
         }
 
         // corner cells
-        h(0    , 0    , k).V = -1.0f * g(1    , 1    , k).V;
-        h(0    , Y - 1, k).V = -1.0f * g(1    , Y - 2, k).V;
-        h(X - 1, 0    , k).V = -1.0f * g(X - 2, 1    , k).V;
-        h(X - 1, Y - 1, k).V = -1.0f * g(X - 2, Y - 2, k).V;
+        h(0    , 0    , k).V = -1.0f * h(1    , 1    , k).V;
+        h(0    , Y - 1, k).V = -1.0f * h(1    , Y - 2, k).V;
+        h(X - 1, 0    , k).V = -1.0f * h(X - 2, 1    , k).V;
+        h(X - 1, Y - 1, k).V = -1.0f * h(X - 2, Y - 2, k).V;
     }
 }
 
 // TODO: test for convergence
-constexpr size_t convergence = 1000;
+constexpr size_t convergence = 40;
 void Fluid::project(const float dt)
 {
-    Grid& g = *curGrid;
-    Grid& h = *workingGrid;
+    Grid& g = *workingGrid;
+    Grid& h = *curGrid;
 
     const float dx = g.getDx();
     const size_t X = g.xDim();
@@ -115,6 +129,14 @@ void Fluid::project(const float dt)
 
 
     g.calc_divergence();
+    for (int i = 0; i < X; i++) {
+      for (int j = 0; j < Y; j++) {
+        for (int k = 0; k < Z; k++) {
+          p[i][j][k] = 0.0;
+          q[i][j][k] = 0.0;
+        }
+      }
+    }
 
     /* Laplace - Jacobi iteration */
     for (size_t n = 0; n < convergence; ++n) {
@@ -125,26 +147,26 @@ void Fluid::project(const float dt)
                 for (size_t j = 1; j < Y - 1; ++j) {
                     q[i][j][k] = ((p[i - 1][j    ][k] + p[i + 1][j    ][k] +
                                    p[i    ][j - 1][k] + p[i    ][j + 1][k])
-                                 - (g(i, j, k).D * (dx * dx))) / 4;
+                                 - (g(i, j, k).D * (dx * dx))) / 4.0f;
                 }
             }
 
             // edge cells
             for (size_t i = 1; i < X - 1; ++i) {
-                q[i][0    ][k] = p[i][1    ][k];
-                q[i][Y - 1][k] = p[i][Y - 2][k];
+                q[i][0    ][k] = q[i][1    ][k];
+                q[i][Y - 1][k] = q[i][Y - 2][k];
             }
 
             for (size_t j = 1; j < Y - 1; ++j) {
-                q[0    ][j][k] = p[1    ][j][k];
-                q[X - 1][j][k] = p[X - 2][j][k];
+                q[0    ][j][k] = q[1    ][j][k];
+                q[X - 1][j][k] = q[X - 2][j][k];
             }
 
             // corner cells
-            q[0    ][0    ][k] = p[1    ][1    ][k];
-            q[0    ][Y - 1][k] = p[1    ][Y - 2][k];
-            q[X - 1][0    ][k] = p[X - 2][1    ][k];
-            q[X - 1][Y - 1][k] = p[X - 2][Y - 2][k];
+            q[0    ][0    ][k] = q[1    ][1    ][k];
+            q[0    ][Y - 1][k] = q[1    ][Y - 2][k];
+            q[X - 1][0    ][k] = q[X - 2][1    ][k];
+            q[X - 1][Y - 1][k] = q[X - 2][Y - 2][k];
         }
 
         // swap
