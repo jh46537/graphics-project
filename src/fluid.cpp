@@ -37,6 +37,9 @@ Fluid::Fluid(const vec3& dim, const float dx, function<void (Grid&)> setup)
     const size_t Z = dim.z;
     p = float3(X, vector<vector<float>>(Y, vector<float>(Z, 0.0f)));
     q = p;
+    omega = vec3(X, vector<vector<float>>(Y, vector<float>(Z, 0.0f)));
+    nu = vec3(X, vector<vector<float>>(Y, vector<float>(Z, 0.0f)));
+    psi = float3(X, vector<vector<float>>(Y, vector<float>(Z, 0.0f)));
 }
 
 Fluid::~Fluid()
@@ -53,6 +56,7 @@ const Grid& Fluid::getGrid() const
 void Fluid::step(const float dt)
 {
     advect(dt);
+    forces(dt);
     project(dt);
 
     // Create conditions for nice looking simulation =)
@@ -184,6 +188,57 @@ void Fluid::project(const float dt)
                         , 0.0f
                     } /
                 dx;
+            }
+        }
+    }
+}
+
+void Fluid::forces(const float dt)
+{
+    float alpha = 0.5;
+    float beta = 0.75;
+    float grav = 9.08;
+
+    Grid& g = *workingGrid;
+    Grid& h = *curGrid;
+    const float dx = g.getDx();
+    for (int i = 0; i < X; i++) {
+      for (int j = 0; j < Y; j++) {
+        for (int k = 0; k < Z; k++) {
+          omega[i][j][k] = 0.0;
+          nu[i][j][k] = 0.0;
+          psi[i][j][k] = 0.0;
+        }
+      }
+    }
+
+
+    for (size_t k = 1; k < Z - 1; ++k) {
+        for (size_t i = 1; i < X - 1; ++i) {
+            for (size_t j = 1; j < Y - 1; ++j) {
+                omega[i][j][k] = vec3{
+                                       abs(h(i, j+1, k).V.z - h(i, j-1, k).V.z - h(i, j, k+1).V.y - h(i, j, k-1).V.y) * 0.5 * 1 / dx
+                                     , abs(h(i, j, k+1).V.x - h(i, j, k-1).V.x - h(i+1, j, k).V.z - h(i-1, j, k).V.z) * 0.5 * 1 / dx
+                                     , abs(h(i+1, j, k).V.y - h(i-1, j, k).V.y - h(i, j+1, k).V.x - h(i, j-1, k).V.x) * 0.5 * 1 / dx
+                                 };
+            }
+        }
+    }
+
+    for (size_t k = 1; k < Z - 1; ++k) {
+        for (size_t i = 1; i < X - 1; ++i) {
+            for (size_t j = 1; j < Y - 1; ++j) {
+                nu[i][j][k] = vec3{
+                                    omega[i+1][j][k] - omega[i - 1][j    ][k    ] * 0.5 * 1 / dx
+                                  , omega[i][j+1][k] - omega[i    ][j - 1][k    ] * 0.5 * 1 / dx
+                                  , omega[i][j][k+1] - omega[i - 1][j    ][k - 1] * 0.5 * 1 / dx
+                              };
+                psi[i][j][k] = vec3{
+                                    nu.x / abs(nu.x)
+                                  , nu.y / abs(nu.y)
+                                  , nu.z / abs(nu.z)
+                              };
+                h(i, j, k).V += cross(psi[i][j][k], omega[i][j][k]) * vorticity_epsilon * dx * dt;
             }
         }
     }
