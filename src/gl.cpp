@@ -20,6 +20,8 @@ using std::vector;
 using glm::vec3;
 using glm::uvec3;
 using glm::mat4;
+using glm::perspective;
+using glm::lookAt;
 
 
 #include "grid.h"
@@ -27,6 +29,7 @@ using glm::mat4;
 #include "gl.h"
 
 
+constexpr float pi = M_PI;
 constexpr size_t log_size = 1024;
 
 
@@ -230,6 +233,62 @@ void Shader::bind_attrib(const vector<const char*>& names) const
 
 
 /*
+ * camera
+ */
+Camera::Camera(float radius, float theta, float phi, float dr, float dt, float dp)
+    : R(radius), T(theta), P(phi), dr(dr), dt(dt), dp(dp) {}
+
+const mat4 Camera::view() const
+{
+    vec3 pos = vec3{
+                    R * sin(P) * sin(T),
+                    R * cos(P),
+                    R * sin(P) * cos(T)
+               };
+    mat4 view = lookAt(
+                    pos,
+                    vec3{ 0.0f, 0.0f, 0.0f },
+                    vec3{ 0.0f, 1.0f, 0.0f }
+                );
+    return view;
+}
+
+void Camera::left()
+{
+    T = fmod((T - dt), (2 * pi));
+}
+
+void Camera::right()
+{
+    T = fmod((T + dt), (2 * pi));
+}
+
+void Camera::up()
+{
+    if (P - dp > 0)
+        P -= dp;
+}
+
+void Camera::down()
+{
+    if (P + dp < pi)
+        P += dp;
+}
+
+void Camera::in()
+{
+    if (R - dr >= 1)
+        R -= dr;
+}
+
+void Camera::out()
+{
+    if (R + dr < 100)
+        R += dr;
+}
+
+
+/*
  * window
  */
 Window::Window(
@@ -238,7 +297,10 @@ Window::Window(
     , size_t width
     , size_t height
     , const char* name
-)
+    , float dr
+    , float dt
+    , float dp
+) : camera(1.0, pi, pi / 2, dr, dt, dp)
 {
     /* initialize window */
     if (!glfwInit()) {
@@ -258,7 +320,7 @@ Window::Window(
         exit(-1);
     }
 
-    ////glfwSetKeyCallback(window, keyboardCallback);
+    glfwSetKeyCallback(window, Window::key_callback);
     glfwMakeContextCurrent(window);
 
 
@@ -291,14 +353,20 @@ bool Window::alive() const
     return !glfwWindowShouldClose(window);
 }
 
-void Window::render(const Voxel& v, const Fluid& sim, const GLint mvp_loc, const GLint opc_loc, const float max_quantity) const
+void Window::render(const Voxel& v, const Fluid& sim, const GLint mvp_loc, const GLint opc_loc, const float max_quantity)
 {
     const Grid& g = sim.getGrid();
 
+    handle_input();
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    mat4 view = camera.view();
+    ////mat4 per{};
+    mat4 per  = perspective(30.0f, 1.0f, 0.01f, 100.0f);
     for (size_t i = 0; i < g.size(); ++i) {
         mat4 mvp = g[i].mvp();
+        mvp = per * view * mvp;
         glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, glm::value_ptr(mvp));
         float opacity = g[i].quantity() / max_quantity;
         glUniform1f(opc_loc, (GLfloat)opacity);
@@ -307,4 +375,38 @@ void Window::render(const Voxel& v, const Fluid& sim, const GLint mvp_loc, const
 
     glfwSwapBuffers(window);
     glfwPollEvents();
+}
+
+bool Window::keys[512] = {false};
+
+void Window::key_callback(GLFWwindow* window, int key, int scancode, int action, int modes)
+{
+    if (action == GLFW_PRESS) {
+        keys[key] = true;
+    }
+    else if (action == GLFW_RELEASE) {
+        keys[key] = false;
+    }
+}
+
+void Window::handle_input()
+{
+    if (keys[GLFW_KEY_LEFT]  || keys[GLFW_KEY_A] || keys[GLFW_KEY_J]) {
+        camera.left();
+    }
+    if (keys[GLFW_KEY_RIGHT] || keys[GLFW_KEY_D] || keys[GLFW_KEY_L]) {
+        camera.right();
+    }
+    if (keys[GLFW_KEY_UP]    || keys[GLFW_KEY_W] || keys[GLFW_KEY_I]) {
+        camera.up();
+    }
+    if (keys[GLFW_KEY_DOWN]  || keys[GLFW_KEY_S] || keys[GLFW_KEY_K]) {
+        camera.down();
+    }
+    if (false                || keys[GLFW_KEY_Q] || keys[GLFW_KEY_U]) {
+        camera.in();
+    }
+    if (false                || keys[GLFW_KEY_E] || keys[GLFW_KEY_O]) {
+        camera.out();
+    }
 }
