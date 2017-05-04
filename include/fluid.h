@@ -11,7 +11,11 @@ class Fluid
     using float3 = vector<vector<vector<float>>>;
     float3 p;
     float3 q;
-    float vorticity_epsilon = 0.000001;
+    vec3* omega;
+    vec3* nu;
+    vec3* psi;
+
+    float vorticity_epsilon = 0.01;
     void swap();
 
     void advect(const float);
