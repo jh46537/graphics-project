@@ -46,22 +46,23 @@ class Camera
     float T;    // theta
     float P;    // phi
 
-    float dr;
-    float dt;
-    float dp;
+    const float speed_r;
+    const float speed_t;
+    const float speed_p;
+    const float speed_div;
 
 public:
 
-    Camera(float, float, float, float, float, float);
+    Camera(float, float, float, float, float, float, float);
 
     const mat4 view() const;
 
-    void left();
-    void right();
-    void up();
-    void down();
-    void in();
-    void out();
+    void left(bool);
+    void right(bool);
+    void up(bool);
+    void down(bool);
+    void in(bool);
+    void out(bool);
 };
 
 
@@ -78,7 +79,7 @@ class Window
 
 public:
 
-    Window(size_t, size_t, size_t, size_t, const char*, float, float, float);
+    Window(size_t, size_t, size_t, size_t, const char*, float, float, float, float);
     ~Window();
 
     bool alive() const;

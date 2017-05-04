@@ -235,8 +235,8 @@ void Shader::bind_attrib(const vector<const char*>& names) const
 /*
  * camera
  */
-Camera::Camera(float radius, float theta, float phi, float dr, float dt, float dp)
-    : R(radius), T(theta), P(phi), dr(dr), dt(dt), dp(dp) {}
+Camera::Camera(float radius, float theta, float phi, float speed_r, float speed_t, float speed_p, float speed_div)
+    : R(radius), T(theta), P(phi), speed_r(speed_r), speed_t(speed_t), speed_p(speed_p), speed_div(speed_div) {}
 
 const mat4 Camera::view() const
 {
@@ -253,36 +253,42 @@ const mat4 Camera::view() const
     return view;
 }
 
-void Camera::left()
+void Camera::left(bool slow)
 {
+    float dt = speed_t * (slow ? speed_div : 1.0);
     T = fmod((T - dt), (2 * pi));
 }
 
-void Camera::right()
+void Camera::right(bool slow)
 {
+    float dt = speed_t * (slow ? speed_div : 1.0);
     T = fmod((T + dt), (2 * pi));
 }
 
-void Camera::up()
+void Camera::up(bool slow)
 {
+    float dp = speed_p * (slow ? speed_div : 1.0);
     if (P - dp > 0)
         P -= dp;
 }
 
-void Camera::down()
+void Camera::down(bool slow)
 {
+    float dp = speed_p * (slow ? speed_div : 1.0);
     if (P + dp < pi)
         P += dp;
 }
 
-void Camera::in()
+void Camera::in(bool slow)
 {
+    float dr = speed_r * (slow ? speed_div : 1.0);
     if (R - dr >= 1)
         R -= dr;
 }
 
-void Camera::out()
+void Camera::out(bool slow)
 {
+    float dr = speed_r * (slow ? speed_div : 1.0);
     if (R + dr < 100)
         R += dr;
 }
@@ -297,10 +303,11 @@ Window::Window(
     , size_t width
     , size_t height
     , const char* name
-    , float dr
-    , float dt
-    , float dp
-) : camera(1.0, pi, pi / 2, dr, dt, dp)
+    , float speed_r
+    , float speed_t
+    , float speed_p
+    , float speed_div
+) : camera(1.0, pi, pi / 2, speed_r, speed_t, speed_p, speed_div)
 {
     /* initialize window */
     if (!glfwInit()) {
@@ -391,22 +398,26 @@ void Window::key_callback(GLFWwindow* window, int key, int scancode, int action,
 
 void Window::handle_input()
 {
+    bool slow = false;
+    if (keys[GLFW_KEY_LEFT_CONTROL] || keys[GLFW_KEY_RIGHT_CONTROL]) {
+        slow = true;
+    }
     if (keys[GLFW_KEY_LEFT]  || keys[GLFW_KEY_A] || keys[GLFW_KEY_J]) {
-        camera.left();
+        camera.left(slow);
     }
     if (keys[GLFW_KEY_RIGHT] || keys[GLFW_KEY_D] || keys[GLFW_KEY_L]) {
-        camera.right();
+        camera.right(slow);
     }
     if (keys[GLFW_KEY_UP]    || keys[GLFW_KEY_W] || keys[GLFW_KEY_I]) {
-        camera.up();
+        camera.up(slow);
     }
     if (keys[GLFW_KEY_DOWN]  || keys[GLFW_KEY_S] || keys[GLFW_KEY_K]) {
-        camera.down();
+        camera.down(slow);
     }
     if (false                || keys[GLFW_KEY_Q] || keys[GLFW_KEY_U]) {
-        camera.in();
+        camera.in(slow);
     }
     if (false                || keys[GLFW_KEY_E] || keys[GLFW_KEY_O]) {
-        camera.out();
+        camera.out(slow);
     }
 }

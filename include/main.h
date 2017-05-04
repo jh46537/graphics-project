@@ -40,14 +40,16 @@ constexpr size_t width  = 800;
 constexpr size_t height = 800;
 const     char*  name   = "smoke";
 
-constexpr float dr = 0.05f;
-constexpr float dt = 0.01f;
-constexpr float dp = 0.01f;
+constexpr float speed_r   = 0.10f;
+constexpr float speed_t   = 0.01f;
+constexpr float speed_p   = 0.01f;
+constexpr float speed_div = 0.10f;
 
-constexpr size_t dim_x = 100;
-constexpr size_t dim_y = 100;
+constexpr size_t N     = 100;
+constexpr size_t dim_x = N;
+constexpr size_t dim_y = N;
 constexpr size_t dim_z = 1;
-constexpr float dx     = 1.0 / 100;
+constexpr float dx     = 1.0 / N;
 
 using clk                  = std::chrono::system_clock;
 constexpr uint64_t fps     = 30;
