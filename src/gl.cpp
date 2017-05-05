@@ -12,12 +12,14 @@ using std::vector;
 
 #include <GL/gl3w.h>
 #include <GLFW/glfw3.h>
+#define GLM_FORCE_SWIZZLE
 #include <glm/glm.hpp>
 #define GLM_FORCE_RADIANS
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
 using glm::vec3;
+using glm::vec4;
 using glm::uvec3;
 using glm::mat4;
 using glm::perspective;
@@ -36,40 +38,54 @@ constexpr size_t log_size = 1024;
 /*
  * voxel
  */
-Voxel::Voxel()
+VoxelGrid::VoxelGrid(const Grid& g)
 {
+    size_t num_cells = g.size();
+
+
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
 
+
     //constexpr float irt3 = 1.0f / sqrt(3);
-    //vec3 vertices[] = {
+    //vec3 voxel_vertices[] = {
     //      vec3{ 0.0f , -irt3 / 2, irt3     } * 2.0f, vec3{1.0f, 1.0f, 1.0f}
     //    , vec3{ -0.5f, -irt3 / 2, -irt3 / 2} * 2.0f, vec3{1.0f, 0.0f, 0.0f}
     //    , vec3{ 0.5f , -irt3 / 2, -irt3 / 2} * 2.0f, vec3{0.0f, 1.0f, 0.0f}
     //    , vec3{ 0.0f , irt3     , 0.0f     } * 2.0f, vec3{0.0f, 0.0f, 1.0f}
     //};
-    vec3 vertices[] = {
-          vec3{ -1.0f, -1.0f, -1.0f }, vec3{ 1.0f, 1.0f, 1.0f }
-        , vec3{  1.0f, -1.0f, -1.0f }, vec3{ 1.0f, 1.0f, 1.0f }
-        , vec3{ -1.0f,  1.0f, -1.0f }, vec3{ 1.0f, 1.0f, 1.0f }
-        , vec3{  1.0f,  1.0f, -1.0f }, vec3{ 1.0f, 1.0f, 1.0f }
-        , vec3{ -1.0f, -1.0f,  1.0f }, vec3{ 1.0f, 1.0f, 1.0f }
-        , vec3{  1.0f, -1.0f,  1.0f }, vec3{ 1.0f, 1.0f, 1.0f }
-        , vec3{ -1.0f,  1.0f,  1.0f }, vec3{ 1.0f, 1.0f, 1.0f }
-        , vec3{  1.0f,  1.0f,  1.0f }, vec3{ 1.0f, 1.0f, 1.0f }
+    vec3 voxel_vertices[] = {
+          vec3{ -1.0f, -1.0f, -1.0f }//, vec3{ 1.0f, 1.0f, 1.0f }
+        , vec3{  1.0f, -1.0f, -1.0f }//, vec3{ 1.0f, 1.0f, 1.0f }
+        , vec3{ -1.0f,  1.0f, -1.0f }//, vec3{ 1.0f, 1.0f, 1.0f }
+        , vec3{  1.0f,  1.0f, -1.0f }//, vec3{ 1.0f, 1.0f, 1.0f }
+        , vec3{ -1.0f, -1.0f,  1.0f }//, vec3{ 1.0f, 1.0f, 1.0f }
+        , vec3{  1.0f, -1.0f,  1.0f }//, vec3{ 1.0f, 1.0f, 1.0f }
+        , vec3{ -1.0f,  1.0f,  1.0f }//, vec3{ 1.0f, 1.0f, 1.0f }
+        , vec3{  1.0f,  1.0f,  1.0f }//, vec3{ 1.0f, 1.0f, 1.0f }
     };
+
+    num_vertices = sizeof(voxel_vertices) / sizeof(vec3);
+    vec3 vertices[num_cells * num_vertices];
+    for (size_t i = 0; i < num_cells; ++i) {
+        for (size_t j = 0; j < num_vertices; ++j) {
+            vertices[i * num_vertices + j] = (g[i].mvp() * vec4{ voxel_vertices[j], 1.0f }).xyz();
+        }
+    }
+
     GLuint vbo;
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-    //GLuint indices[] = {
+
+    //GLuint voxel_indices[] = {
     //      0, 1, 2
     //    , 0, 2, 3
     //    , 0, 3, 1
     //    , 1, 3, 2
     //};
-    GLuint indices[] = {
+    GLuint voxel_indices[] = {
           0, 1, 2
         , 2, 1, 3
 
@@ -88,30 +104,53 @@ Voxel::Voxel()
         , 5, 4, 7
         , 7, 4, 6
     };
-    index_size = sizeof(indices) / sizeof(GLuint);
+
+    size_t num_indices = sizeof(voxel_indices) / sizeof(GLuint);
+    index_size = num_cells * num_indices;
+    GLuint indices[index_size];
+    for (size_t i = 0; i < num_cells; ++i) {
+        for (size_t j = 0; j < num_indices; ++j) {
+            indices[i * num_indices + j] = i * num_vertices + voxel_indices[j];
+        }
+    }
+
     GLuint ibo;
     glGenBuffers(1, &ibo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 
-    glBindBuffer(GL_ARRAY_BUFFER, vao);
-
     glEnableVertexAttribArray(0);
+    ////glEnableVertexAttribArray(1);
+    ////glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(0));
+    ////glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)(0));
+
+
+    size_t size = g.size();
+    float quantities[size * num_vertices];
+    for (size_t i = 0; i < size; ++i)
+        for (size_t j = 0; j < num_vertices; ++j)
+            quantities[i * num_vertices + j] = g[i].quantity();
+    glGenBuffers(1, &qbo);
+    glBindBuffer(GL_ARRAY_BUFFER, qbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(quantities), quantities, GL_STATIC_DRAW);
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(0));
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+    glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, 1 * sizeof(GLfloat), (GLvoid*)(0));
+
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
 }
 
-Voxel::Voxel(Voxel&& that)
-{
-    vao = that.vao;
-    index_size = that.index_size;
-    that.vao = 0;
-    that.index_size = 0;
-}
+//VoxelGrid::VoxelGrid(VoxelGrid&& that)
+//{
+//    vao = that.vao;
+//    index_size = that.index_size;
+//    that.vao = 0;
+//    that.index_size = 0;
+//}
 
-Voxel::~Voxel()
+VoxelGrid::~VoxelGrid()
 {
     if (vao) {
         glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -120,19 +159,17 @@ Voxel::~Voxel()
     }
 }
 
-void Voxel::render() const
+void VoxelGrid::render(const Grid& g) const
 {
-    //glBindBuffer(GL_ARRAY_BUFFER, vao);
-
-    //glEnableVertexAttribArray(0);
-    //glEnableVertexAttribArray(1);
-    //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(0));
-    //glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+    ////glEnableVertexAttribArray(0);
+    ////glEnableVertexAttribArray(1);
+    ////glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(0));
+    ////glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
     glDrawElements(GL_TRIANGLES, index_size, GL_UNSIGNED_INT, 0);
-    //glDisableVertexAttribArray(0);
-    //glDisableVertexAttribArray(1);
+    ////glDisableVertexAttribArray(0);
+    ////glDisableVertexAttribArray(1);
 
-    //glBindBuffer(GL_ARRAY_BUFFER, 0);
+    ////glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 
@@ -359,12 +396,17 @@ Window::~Window()
     glfwTerminate();
 }
 
+void Window::start(const float max_quanitity, const GLint max_loc) const
+{
+    glUniform1f(max_loc, (GLfloat)max_quanitity);
+}
+
 bool Window::alive() const
 {
     return !glfwWindowShouldClose(window);
 }
 
-void Window::render(const Voxel& v, const Fluid& sim, const GLint mvp_loc, const GLint opc_loc, const float max_quantity)
+void Window::render(const VoxelGrid& v, const Fluid& sim, const GLint mvp_loc)
 {
     const Grid& g = sim.getGrid();
 
@@ -373,16 +415,11 @@ void Window::render(const Voxel& v, const Fluid& sim, const GLint mvp_loc, const
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     mat4 view = camera.view();
-    ////mat4 per{};
     mat4 per  = perspective(30.0f, 1.0f, 0.01f, 100.0f);
-    for (size_t i = 0; i < g.size(); ++i) {
-        mat4 mvp = g[i].mvp();
-        mvp = per * view * mvp;
-        glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, glm::value_ptr(mvp));
-        float opacity = g[i].quantity() / max_quantity;
-        glUniform1f(opc_loc, (GLfloat)opacity);
-        v.render();
-    }
+    mat4 mvp = per * view;
+    glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, glm::value_ptr(mvp));
+
+    v.render(g);
 
     glfwSwapBuffers(window);
     glfwPollEvents();

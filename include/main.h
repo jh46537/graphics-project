@@ -49,7 +49,7 @@ constexpr size_t N     = 100;
 constexpr size_t dim_x = N;
 constexpr size_t dim_y = N;
 constexpr size_t dim_z = 1;
-constexpr float dx     = 1.0 / N;
+constexpr float  dx    = 1.0 / N;
 
 using clk                  = std::chrono::system_clock;
 constexpr uint64_t fps     = 30;

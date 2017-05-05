@@ -3,17 +3,19 @@
 /*
  * voxel
  */
-class Voxel
+class VoxelGrid
 {
     GLuint vao;
+    GLuint qbo;
     size_t index_size;
+    size_t num_vertices;
 
 public:
 
-    Voxel();
-    Voxel(Voxel&&);
-    ~Voxel();
-    void render() const;
+    VoxelGrid(const Grid&);
+    //VoxelGrid(VoxelGrid&&);
+    ~VoxelGrid();
+    void render(const Grid&) const;
 };
 
 
@@ -82,8 +84,9 @@ public:
     Window(size_t, size_t, size_t, size_t, const char*, float, float, float, float);
     ~Window();
 
+    void start(const float, const GLint) const;
     bool alive() const;
-    void render(const Voxel&, const Fluid&, const GLint, const GLint, const float);
+    void render(const VoxelGrid&, const Fluid&, const GLint);
 
     static void key_callback(GLFWwindow*, int, int, int, int);
     void handle_input();

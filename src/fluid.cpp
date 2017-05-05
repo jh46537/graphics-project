@@ -25,7 +25,7 @@ using glm::mat4;
 /*
  * Navier–Stokes
  */
-Fluid::Fluid(const vec3& dim, const float dx, function<void (Grid&)> setup)
+Fluid::Fluid(const uvec3& dim, const float dx, function<void (Grid&)> setup)
 {
     curGrid     = new Grid(dim, dx, setup);
     workingGrid = new Grid{ *curGrid };
@@ -66,11 +66,11 @@ void Fluid::step(const float dt)
             (*curGrid)(i, j, 0).Q = (*curGrid).bilerp(pos).Q;
         }
     }
-    for (size_t i = 45; i < 55; i++) {
-      for (size_t j = 45; j < 50; j++) {
+    for (size_t i = 45; i < 55; ++i) {
+      for (size_t j = 45; j < 50; ++j) {
           (*curGrid)(i, j, 0).V += vec3{0.0f, -18.0f, 0.0f};
       }
-      for (size_t j = 50; j < 55; j++) {
+      for (size_t j = 50; j < 55; ++j) {
           (*curGrid)(i, j, 0).V += vec3{0.0f, 18.0f, 0.0f};
       }
     }
@@ -133,9 +133,9 @@ void Fluid::project(const float dt)
 
 
     g.calc_divergence();
-    for (int i = 0; i < X; i++) {
-      for (int j = 0; j < Y; j++) {
-        for (int k = 0; k < Z; k++) {
+    for (size_t i = 0; i < X; ++i) {
+      for (size_t j = 0; j < Y; ++j) {
+        for (size_t k = 0; k < Z; ++k) {
           p[i][j][k] = 0.0;
           q[i][j][k] = 0.0;
         }
@@ -205,9 +205,9 @@ void Fluid::forces(const float dt)
     const size_t Z = g.zDim();
 
     const float dx = g.getDx();
-    for (int i = 0; i < X; i++) {
-      for (int j = 0; j < Y; j++) {
-        for (int k = 0; k < Z; k++) {
+    for (size_t i = 0; i < X; ++i) {
+      for (size_t j = 0; j < Y; ++j) {
+        for (size_t k = 0; k < Z; ++k) {
           omega[i + j * X + k * Y * Z] = vec3(0.0, 0.0, 0.0);
           nu[i + j * X + k * Y * Z] = vec3(0.0, 0.0, 0.0);
           psi[i + j * X + k * Y * Z] = vec3(0.0, 0.0, 0.0);

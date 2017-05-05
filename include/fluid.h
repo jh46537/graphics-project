@@ -24,7 +24,7 @@ class Fluid
 
 public:
 
-    Fluid(const vec3&, const float, function<void (Grid&)>);
+    Fluid(const uvec3&, const float, function<void (Grid&)>);
     ~Fluid();
 
     const Grid& getGrid() const;

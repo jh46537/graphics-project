@@ -33,8 +33,8 @@ using Cell = Grid::Cell;
 
 Cell::Cell(vec3 V, float Q) : T(0), MVP(0), V(V), Q(Q) {};
 
-Cell::Cell(const vec3 T, const mat4 MVP, vec3 V, float Q)
-    : T(T), MVP(MVP), V(V), Q(Q) {};
+Cell::Cell(const vec3 T, const mat4 MVP)
+    : T(T), MVP(MVP), V(vec3{}), Q(0) {};
 
 Cell::Cell(const Cell& that)
     : T(that.T), MVP(that.MVP), V(that.V), Q(that.Q) {};
@@ -94,6 +94,8 @@ const float& Cell::quantity() const
 Grid::Grid(const vec3& dim, const float dx, function<void (Grid&)> setup)
     : dim_x(dim.x), dim_y(dim.y), dim_z(dim.z), dx(dx)
 {
+    cells.reserve(dim_x * dim_y * dim_y);
+
     for (size_t i = 0; i < dim_x; ++i) {
         for (size_t j = 0; j < dim_y; ++j) {
             for (size_t k = 0; k < dim_z; ++k) {
@@ -105,7 +107,7 @@ Grid::Grid(const vec3& dim, const float dx, function<void (Grid&)> setup)
                 mat4 MVP{};
                 MVP = translate(MVP, T);
                 MVP = scale(MVP, vec3{ dx, dx, dx });
-                cells.push_back(Cell{ T, MVP, vec3{ 0.0, 0.0, 0.0 }, 0.0 });
+                cells.push_back(Cell{ T, MVP });
             }
         }
     }

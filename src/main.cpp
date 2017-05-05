@@ -2,17 +2,7 @@
 
 int main(int argc, char** argv)
 {
-    Window w{ version_major, version_minor, width, height, name, speed_r, speed_t, speed_p, speed_div };
-
-    Voxel v;
-
-    Shader s;
-    s.add(GL_VERTEX_SHADER  , "shader/shader.vert");
-    s.add(GL_FRAGMENT_SHADER, "shader/shader.frag");
-    s.bind_attrib({"position", "in_color"});
-    s.activate();
-    GLint mvp_loc = s.uniform("mvp");
-    GLint opc_loc = s.uniform("opacity");
+    uvec3 dim{ dim_x, dim_y, dim_z };
 
     /*
      * x:   -1 (left)             ->  +1 (right)
@@ -37,7 +27,33 @@ int main(int argc, char** argv)
             }
         }
     };
-    Fluid sim{ vec3{ dim_x, dim_y, dim_z }, dx, setup};
+    Fluid sim{ dim, dx, setup};
+
+    Window w{
+          version_major
+        , version_minor
+        , width
+        , height
+        , name
+        , speed_r
+        , speed_t
+        , speed_p
+        , speed_div
+    };
+
+    Shader s;
+    s.add(GL_VERTEX_SHADER  , "shader/shader.vert");
+    s.add(GL_FRAGMENT_SHADER, "shader/shader.frag");
+    ////s.bind_attrib({"position", "in_color"});
+    s.bind_attrib({"position", "quantity_v"});
+    s.activate();
+    GLint mvp_loc = s.uniform("mvp");
+    GLint max_loc = s.uniform("max_quantity");
+    ////GLint opc_loc = s.uniform("opacity");
+
+    w.start(max_quantity, max_loc);
+
+    VoxelGrid v{ sim.getGrid() };
 
     /*
      * render loop
@@ -50,7 +66,7 @@ int main(int argc, char** argv)
         if (clk::now() > t_render) {
             t_render += t_frame;
             auto t_start = clk::now();
-            w.render(v, sim, mvp_loc, opc_loc, max_quantity);
+            w.render(v, sim, mvp_loc);
             auto t_end   = clk::now();
             cout << "[render after " << num_ticks << " simulations]" << endl;
             cout << "[render took " << (t_end - t_start).count() << " ns]" << endl;

@@ -19,7 +19,7 @@ public:
         float D;
 
         Cell(vec3, float);
-        Cell(const vec3, const mat4, vec3, float);
+        Cell(const vec3, const mat4);
         Cell(const Cell&);
 
         Cell& operator=(const Cell&);
