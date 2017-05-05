@@ -73,10 +73,11 @@ VoxelGrid::VoxelGrid(const Grid& g)
         }
     }
 
-    GLuint vbo;
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)(0));
 
 
     //GLuint voxel_indices[] = {
@@ -120,26 +121,10 @@ VoxelGrid::VoxelGrid(const Grid& g)
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 
-    glEnableVertexAttribArray(0);
-    ////glEnableVertexAttribArray(1);
-    ////glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(0));
-    ////glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)(0));
-
-
-    size_t size = g.size();
-    float quantities[size * num_vertices];
-    for (size_t i = 0; i < size; ++i)
-        for (size_t j = 0; j < num_vertices; ++j)
-            quantities[i * num_vertices + j] = g[i].quantity();
     glGenBuffers(1, &qbo);
     glBindBuffer(GL_ARRAY_BUFFER, qbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(quantities), quantities, GL_STATIC_DRAW);
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, 1 * sizeof(GLfloat), (GLvoid*)(0));
-
-
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
 }
 
 //VoxelGrid::VoxelGrid(VoxelGrid&& that)
@@ -161,6 +146,14 @@ VoxelGrid::~VoxelGrid()
 
 void VoxelGrid::render(const Grid& g) const
 {
+    size_t size = g.size();
+    float quantities[size * num_vertices];
+    for (size_t i = 0; i < size; ++i)
+        for (size_t j = 0; j < num_vertices; ++j)
+            quantities[i * num_vertices + j] = g[i].quantity();
+    glBufferData(GL_ARRAY_BUFFER, sizeof(quantities), quantities, GL_STATIC_DRAW);
+
+
     ////glEnableVertexAttribArray(0);
     ////glEnableVertexAttribArray(1);
     ////glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(0));
@@ -168,8 +161,6 @@ void VoxelGrid::render(const Grid& g) const
     glDrawElements(GL_TRIANGLES, index_size, GL_UNSIGNED_INT, 0);
     ////glDisableVertexAttribArray(0);
     ////glDisableVertexAttribArray(1);
-
-    ////glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 
@@ -415,8 +406,8 @@ void Window::render(const VoxelGrid& v, const Fluid& sim, const GLint mvp_loc)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     mat4 view = camera.view();
-    mat4 per  = perspective(30.0f, 1.0f, 0.01f, 100.0f);
-    mat4 mvp = per * view;
+    mat4 per  = perspective(pi / 2, 1.0f, 0.01f, 100.0f);
+    mat4 mvp  = per * view;
     glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, glm::value_ptr(mvp));
 
     v.render(g);

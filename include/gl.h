@@ -6,6 +6,7 @@
 class VoxelGrid
 {
     GLuint vao;
+    GLuint vbo;
     GLuint qbo;
     size_t index_size;
     size_t num_vertices;
