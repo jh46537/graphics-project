@@ -66,7 +66,7 @@ VoxelGrid::VoxelGrid(const Grid& g)
     };
 
     num_vertices = sizeof(voxel_vertices) / sizeof(vec3);
-    vec3 vertices[num_cells * num_vertices];
+    vertices = vector<vec3>( num_cells * num_vertices );
     for (size_t i = 0; i < num_cells; ++i) {
         for (size_t j = 0; j < num_vertices; ++j) {
             vertices[i * num_vertices + j] = (g[i].mvp() * vec4{ voxel_vertices[j], 1.0f }).xyz();
@@ -75,7 +75,7 @@ VoxelGrid::VoxelGrid(const Grid& g)
 
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(vec3), vertices.data(), GL_STATIC_DRAW);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)(0));
 
@@ -108,7 +108,7 @@ VoxelGrid::VoxelGrid(const Grid& g)
 
     size_t num_indices = sizeof(voxel_indices) / sizeof(GLuint);
     index_size = num_cells * num_indices;
-    GLuint indices[index_size];
+    indices = vector<GLuint>( index_size );
     for (size_t i = 0; i < num_cells; ++i) {
         for (size_t j = 0; j < num_indices; ++j) {
             indices[i * num_indices + j] = i * num_vertices + voxel_indices[j];
@@ -118,9 +118,10 @@ VoxelGrid::VoxelGrid(const Grid& g)
     GLuint ibo;
     glGenBuffers(1, &ibo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), indices.data(), GL_STATIC_DRAW);
 
 
+    quantities = vector<float>( num_cells * num_vertices );
     glGenBuffers(1, &qbo);
     glBindBuffer(GL_ARRAY_BUFFER, qbo);
     glEnableVertexAttribArray(1);
@@ -144,14 +145,13 @@ VoxelGrid::~VoxelGrid()
     }
 }
 
-void VoxelGrid::render(const Grid& g) const
+void VoxelGrid::render(const Grid& g)
 {
     size_t size = g.size();
-    float quantities[size * num_vertices];
     for (size_t i = 0; i < size; ++i)
         for (size_t j = 0; j < num_vertices; ++j)
             quantities[i * num_vertices + j] = g[i].quantity();
-    glBufferData(GL_ARRAY_BUFFER, sizeof(quantities), quantities, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, quantities.size() * sizeof(float), quantities.data(), GL_STATIC_DRAW);
 
 
     ////glEnableVertexAttribArray(0);
@@ -397,7 +397,7 @@ bool Window::alive() const
     return !glfwWindowShouldClose(window);
 }
 
-void Window::render(const VoxelGrid& v, const Fluid& sim, const GLint mvp_loc)
+void Window::render(VoxelGrid& v, const Fluid& sim, const GLint mvp_loc)
 {
     const Grid& g = sim.getGrid();
 

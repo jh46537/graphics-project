@@ -8,6 +8,9 @@ class VoxelGrid
     GLuint vao;
     GLuint vbo;
     GLuint qbo;
+    vector<vec3>   vertices;
+    vector<GLuint> indices;
+    vector<float>  quantities;
     size_t index_size;
     size_t num_vertices;
 
@@ -16,7 +19,7 @@ public:
     VoxelGrid(const Grid&);
     //VoxelGrid(VoxelGrid&&);
     ~VoxelGrid();
-    void render(const Grid&) const;
+    void render(const Grid&);
 };
 
 
@@ -87,7 +90,7 @@ public:
 
     void start(const float, const GLint) const;
     bool alive() const;
-    void render(const VoxelGrid&, const Fluid&, const GLint);
+    void render(VoxelGrid&, const Fluid&, const GLint);
 
     static void key_callback(GLFWwindow*, int, int, int, int);
     void handle_input();

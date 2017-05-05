@@ -27,9 +27,9 @@ int main(int argc, char** argv)
             }
         }
     };
-    Fluid sim{ dim, dx, setup};
+    Fluid* sim = new Fluid{ dim, dx, setup};
 
-    Window w{
+    Window* w = new Window{
           version_major
         , version_minor
         , width
@@ -41,19 +41,19 @@ int main(int argc, char** argv)
         , speed_div
     };
 
-    Shader s;
-    s.add(GL_VERTEX_SHADER  , "shader/shader.vert");
-    s.add(GL_FRAGMENT_SHADER, "shader/shader.frag");
-    ////s.bind_attrib({"position", "in_color"});
-    s.bind_attrib({"position", "quantity_v"});
-    s.activate();
-    GLint mvp_loc = s.uniform("mvp");
-    GLint max_loc = s.uniform("max_quantity");
-    ////GLint opc_loc = s.uniform("opacity");
+    Shader* s = new Shader;
+    s->add(GL_VERTEX_SHADER  , "shader/shader.vert");
+    s->add(GL_FRAGMENT_SHADER, "shader/shader.frag");
+    ////s->bind_attrib({"position", "in_color"});
+    s->bind_attrib({"position", "quantity_v"});
+    s->activate();
+    GLint mvp_loc = s->uniform("mvp");
+    GLint max_loc = s->uniform("max_quantity");
+    ////GLint opc_loc = s->uniform("opacity");
 
-    w.start(max_quantity, max_loc);
+    w->start(max_quantity, max_loc);
 
-    VoxelGrid v{ sim.getGrid() };
+    VoxelGrid* v = new VoxelGrid{ sim->getGrid() };
 
     /*
      * render loop
@@ -62,11 +62,11 @@ int main(int argc, char** argv)
     auto t_render    = clk::now();
     size_t num_ticks = 10;          // initialize > 0
 
-    while (w.alive()) {
+    while (w->alive()) {
         if (clk::now() > t_render) {
             t_render += t_frame;
             auto t_start = clk::now();
-            w.render(v, sim, mvp_loc);
+            w->render(*v, *sim, mvp_loc);
             auto t_end   = clk::now();
             cout << "[render after " << num_ticks << " simulations]" << endl;
             cout << "[render took " << (t_end - t_start).count() << " ns]" << endl;
@@ -75,13 +75,18 @@ int main(int argc, char** argv)
         }
 
         //auto t_start = clk::now();
-        sim.step(dt);
+        sim->step(dt);
         //auto t_end   = clk::now();
 
         ////dt = (t_end - t_start).count() / static_cast<float>(t_unit);
         //cout << "[simulation took " << (t_end - t_start).count() << " ns]" << endl;
         ++num_ticks;
     }
+
+    delete(v);
+    delete(s);
+    delete(w);
+    delete(sim);
 
     return 0;
 }
