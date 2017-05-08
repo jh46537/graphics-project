@@ -12,7 +12,6 @@ using std::vector;
 
 #include <GL/gl3w.h>
 #include <GLFW/glfw3.h>
-#define GLM_FORCE_SWIZZLE
 #include <glm/glm.hpp>
 #define GLM_FORCE_RADIANS
 #include <glm/gtc/type_ptr.hpp>
@@ -69,7 +68,7 @@ VoxelGrid::VoxelGrid(const Grid& g)
     vertices = vector<vec3>( num_cells * num_vertices );
     for (size_t i = 0; i < num_cells; ++i) {
         for (size_t j = 0; j < num_vertices; ++j) {
-            vertices[i * num_vertices + j] = (g[i].mvp() * vec4{ voxel_vertices[j], 1.0f }).xyz();
+            vertices[i * num_vertices + j] = vec3{ g[i].mvp() * vec4{ voxel_vertices[j], 1.0f } };
         }
     }
 

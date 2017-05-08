@@ -49,7 +49,7 @@ public:
 
     size_t id;
 
-    Grid(const vec3&, const float, function<void (Grid&)>);
+    Grid(const uvec3&, const float, function<void (Grid&)>);
     Grid(const Grid&);
 
     size_t size() const;

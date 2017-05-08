@@ -91,7 +91,7 @@ const float& Cell::quantity() const
 /*
  * grid
  */
-Grid::Grid(const vec3& dim, const float dx, function<void (Grid&)> setup)
+Grid::Grid(const uvec3& dim, const float dx, function<void (Grid&)> setup)
     : dim_x(dim.x), dim_y(dim.y), dim_z(dim.z), dx(dx)
 {
     cells.reserve(dim_x * dim_y * dim_y);
