@@ -62,6 +62,7 @@ public:
     const size_t xDim() const;
     const size_t yDim() const;
     const size_t zDim() const;
+    const float totalQuantity() const;
 
     Cell bilerp(vec3) const;
     void calc_divergence();

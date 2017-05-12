@@ -162,6 +162,19 @@ const size_t Grid::zDim() const
     return dim_z;
 }
 
+const float Grid::totalQuantity() const
+{
+    float total = 0.0;
+    for (size_t i = 0; i < dim_x; ++i) {
+        for (size_t j = 0; j < dim_y; ++j) {
+            for (size_t k = 0; k < dim_z; ++k) {
+                total += self(i, j, k).Q;
+            }
+        }
+    }
+    return total;
+}
+
 Cell Grid::bilerp(vec3 pos) const
 {
     size_t x1 = clamp(floor(pos.x), 0.0f, float(dim_x - 1));
