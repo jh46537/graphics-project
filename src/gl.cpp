@@ -86,23 +86,23 @@ VoxelGrid::VoxelGrid(const Grid& g)
     //    , 1, 3, 2
     //};
     GLuint voxel_indices[] = {
-          0, 1, 2
-        , 2, 1, 3
+          0, 2, 1
+        , 2, 3, 1
 
-        , 0, 4, 1
-        , 1, 4, 5
+        , 0, 1, 4
+        , 1, 5, 4
 
-        , 0, 2, 4
-        , 4, 2, 6
+        , 0, 4, 2
+        , 4, 6, 2
 
-        , 1, 5, 3
-        , 3, 5, 7
+        , 1, 3, 5
+        , 3, 7, 5
 
-        , 2, 3, 6
-        , 6, 3, 7
+        , 2, 6, 3
+        , 6, 7, 3
 
-        , 5, 4, 7
-        , 7, 4, 6
+        , 5, 7, 4
+        , 7, 6, 4
     };
 
     size_t num_indices = sizeof(voxel_indices) / sizeof(GLuint);
@@ -368,6 +368,8 @@ Window::Window(
         cerr << "[OpenGL " << version_major << "." << version_minor << " not supported]" << endl;
         exit(-1);
     }
+
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
