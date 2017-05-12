@@ -33,6 +33,8 @@ using glm::lookAt;
 constexpr float pi = M_PI;
 constexpr size_t log_size = 1024;
 
+constexpr bool draw_velocity = false;
+constexpr float max_velocity = 200.0;
 
 /*
  * voxel
@@ -53,15 +55,16 @@ VoxelGrid::VoxelGrid(const Grid& g)
     //    , vec3{ 0.5f , -irt3 / 2, -irt3 / 2} * 2.0f, vec3{0.0f, 1.0f, 0.0f}
     //    , vec3{ 0.0f , irt3     , 0.0f     } * 2.0f, vec3{0.0f, 0.0f, 1.0f}
     //};
+    float scale = 0.95;
     vec3 voxel_vertices[] = {
-          vec3{ -1.0f, -1.0f, -1.0f }//, vec3{ 1.0f, 1.0f, 1.0f }
-        , vec3{  1.0f, -1.0f, -1.0f }//, vec3{ 1.0f, 1.0f, 1.0f }
-        , vec3{ -1.0f,  1.0f, -1.0f }//, vec3{ 1.0f, 1.0f, 1.0f }
-        , vec3{  1.0f,  1.0f, -1.0f }//, vec3{ 1.0f, 1.0f, 1.0f }
-        , vec3{ -1.0f, -1.0f,  1.0f }//, vec3{ 1.0f, 1.0f, 1.0f }
-        , vec3{  1.0f, -1.0f,  1.0f }//, vec3{ 1.0f, 1.0f, 1.0f }
-        , vec3{ -1.0f,  1.0f,  1.0f }//, vec3{ 1.0f, 1.0f, 1.0f }
-        , vec3{  1.0f,  1.0f,  1.0f }//, vec3{ 1.0f, 1.0f, 1.0f }
+          vec3{ -1.0f*scale, -1.0f*scale, -1.0f*scale }//, vec3{ 1.0f, 1.0f, 1.0f }
+        , vec3{  1.0f*scale, -1.0f*scale, -1.0f*scale }//, vec3{ 1.0f, 1.0f, 1.0f }
+        , vec3{ -1.0f*scale,  1.0f*scale, -1.0f*scale }//, vec3{ 1.0f, 1.0f, 1.0f }
+        , vec3{  1.0f*scale,  1.0f*scale, -1.0f*scale }//, vec3{ 1.0f, 1.0f, 1.0f }
+        , vec3{ -1.0f*scale, -1.0f*scale,  1.0f*scale }//, vec3{ 1.0f, 1.0f, 1.0f }
+        , vec3{  1.0f*scale, -1.0f*scale,  1.0f*scale }//, vec3{ 1.0f, 1.0f, 1.0f }
+        , vec3{ -1.0f*scale,  1.0f*scale,  1.0f*scale }//, vec3{ 1.0f, 1.0f, 1.0f }
+        , vec3{  1.0f*scale,  1.0f*scale,  1.0f*scale }//, vec3{ 1.0f, 1.0f, 1.0f }
     };
 
     num_vertices = sizeof(voxel_vertices) / sizeof(vec3);
@@ -149,7 +152,10 @@ void VoxelGrid::render(const Grid& g)
     size_t size = g.size();
     for (size_t i = 0; i < size; ++i)
         for (size_t j = 0; j < num_vertices; ++j)
-            quantities[i * num_vertices + j] = g[i].quantity();
+            if (!draw_velocity)
+              quantities[i * num_vertices + j] = g[i].quantity();
+            else
+              quantities[i * num_vertices + j] = length(g[i].velocity());
     glBufferData(GL_ARRAY_BUFFER, quantities.size() * sizeof(float), quantities.data(), GL_STATIC_DRAW);
 
 
@@ -390,7 +396,10 @@ Window::~Window()
 
 void Window::start(const float max_quanitity, const GLint max_loc) const
 {
-    glUniform1f(max_loc, (GLfloat)max_quanitity);
+    if (!draw_velocity)
+      glUniform1f(max_loc, (GLfloat)max_quanitity);
+    else
+      glUniform1f(max_loc, (GLfloat)max_velocity);
 }
 
 bool Window::alive() const
