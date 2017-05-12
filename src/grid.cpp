@@ -31,7 +31,7 @@ using glm::mix;
  */
 using Cell = Grid::Cell;
 
-Cell::Cell(vec3 V, float Q) : T(0), MVP(0), V(V), Q(Q) {};
+Cell::Cell(vec3 V, float Q, float Te) : T(0), MVP(0), V(V), Q(Q), Te(Te) {};
 
 Cell::Cell(const vec3 T, const mat4 MVP)
     : T(T), MVP(MVP), V(vec3{}), Q(0) {};
@@ -44,6 +44,7 @@ Cell& Cell::operator=(const Cell& that)
     // does not overwrite T, MVP
     V = that.V;
     Q = that.Q;
+    Te = that.Te;
     return *this;
 }
 
@@ -180,7 +181,11 @@ Cell Grid::bilerp(vec3 pos) const
     float q_x2 = mix(self(x1, y2, z).Q, self(x2, y2, z).Q, x_amt);
     float q    = mix(q_x1, q_x2, y_amt);
 
-    return Cell( v, q );
+    float t_x1 = mix(self(x1, y1, z).Te, self(x2, y1, z).Te, x_amt);
+    float t_x2 = mix(self(x1, y2, z).Te, self(x2, y2, z).Te, x_amt);
+    float t    = mix(t_x1, t_x2, y_amt);
+
+    return Cell( v, q, t );
 }
 
 void Grid::calc_divergence()

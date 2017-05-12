@@ -17,10 +17,10 @@ using glm::vec3;
 using glm::uvec3;
 using glm::mat4;
 
-
 #include "grid.h"
 #include "fluid.h"
 
+constexpr float max_quantity = 1000.0f;
 
 /*
  * Navier–Stokes
@@ -67,10 +67,11 @@ void Fluid::step(const float dt)
     for (size_t i = 0; i < 100; ++i) {
         for (size_t j = 0; j < 100; ++j) {
             vec3 pos = vec3(i, j, 0) - (*curGrid)(i, j, 0).V * dt;
-            (*curGrid)(i, j, 0).Q = (*curGrid).bilerp(pos).Q;
+            (*workingGrid)(i, j, 0).Q = (*curGrid).bilerp(pos).Q;
+            (*workingGrid)(i, j, 0).Te = (*curGrid).bilerp(pos).Te;
         }
     }
-    
+    swap();
     /*for (size_t i = 45; i < 55; ++i) {
       for (size_t j = 45; j < 50; ++j) {
           (*curGrid)(i, j, 0).V += vec3{0.0f, 18.0f, 0.0f};
@@ -199,8 +200,8 @@ void Fluid::project(const float dt)
 
 void Fluid::forces(const float dt)
 {
-    float alpha = 3.7453 * 3;
-    float beta = 0.1453 * 3;
+    float alpha = 3.7453;
+    float beta = 0.1453;
     float grav = -9.08;
     float total_accel = 0.0;
 
@@ -231,11 +232,10 @@ void Fluid::forces(const float dt)
           nu[i][j][k] = vec3(0.0, 0.0, 0.0);
           psi[i][j][k] = vec3(0.0, 0.0, 0.0);
           if(g(i, j, k).Q != 0.0){
-            total_accel = (-alpha * (g(i, j, k).Q / 500.0) + beta * (50.0 * (g(i, j, k).Q / 500.0))); // / (g(i, j, k).Q  + 1.0);
-            total_accel += 0.01 * grav; // / (g(i, j, k).Q  + 1.0);
+            total_accel = (-alpha * (g(i, j, k).Q / max_quantity * 0.8) - beta * (300 - g(i,j,k).Te));// / (g(i, j, k).Q / max_quantity * 0.8 * dx * dx + 1.0 );
+            total_accel += 0.001 * grav;
             g(i, j, k).V += vec3(0.0, (total_accel * dt), 0.0);
           }
-          
         }
       }
     }
@@ -267,15 +267,11 @@ void Fluid::forces(const float dt)
                                   , nu[i][j][k].y / abs(nu[i][j][k].y)
                                   , nu[i][j][k].z / abs(nu[i][j][k].z)
                               );
-                vec3 crossed = vec3(
-                                       psi[i][j][k].y * omega[i][j][k].z - psi[i][j][k].z * omega[i][j][k].y
-                                     , psi[i][j][k].z * omega[i][j][k].x - psi[i][j][k].x * omega[i][j][k].z
-                                     , psi[i][j][k].x * omega[i][j][k].y - psi[i][j][k].y * omega[i][j][k].x
-                                 );
+                vec3 crossed = cross(psi[i][j][k], omega[i][j][k]);
                 crossed.x *= vorticity_epsilon * dx * dt;
                 crossed.y *= vorticity_epsilon * dx * dt;
                 crossed.z *= vorticity_epsilon * dx * dt;
-                //g(i, j, k).V += crossed;
+                g(i, j, k).V += crossed;
             }
         }
     }

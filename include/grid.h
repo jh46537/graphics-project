@@ -17,8 +17,9 @@ public:
         vec3  V;
         float Q;
         float D;
+        float Te;
 
-        Cell(vec3, float);
+        Cell(vec3, float, float);
         Cell(const vec3, const mat4);
         Cell(const Cell&);
 

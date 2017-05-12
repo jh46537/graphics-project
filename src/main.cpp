@@ -18,11 +18,16 @@ int main(int argc, char** argv)
                         j >= dim_y / 4 && j < max<size_t>(dim_y * 3 / 4, 1) &&
                         k >= dim_z / 4 && k < max<size_t>(dim_z * 3 / 4, 1)) {
                         g(i, j, k).quantity() = max_quantity/2;
+                        g(i, j, k).Te = 350.0;
                     }
                     else {
                         //g(i, j, k).quantity() = max_quantity / 2;
+                        g(i, j, k).Te = 300.0;
                     }
-                    g(i, j, k).velocity() = vec3{ 0.0f, 1.0f, 0.0f };
+                    float r1 = (float(rand()) / float(RAND_MAX)) * 2.0 - 1.0;
+                    float r2 = float(rand()) / float(RAND_MAX) * 2.0 - 1.0;
+                    float r3 = float(rand()) / float(RAND_MAX) * 2.0 - 1.0;
+                    g(i, j, k).velocity() = vec3{ r1 * 5.0, r2 * 5.0, r3 * 5.0 };
                 }
             }
         }
