@@ -73,14 +73,25 @@ void Fluid::step(const float dt)
         }
     }
     swap();
-    /*for (size_t i = 45; i < 55; ++i) {
-      for (size_t j = 45; j < 50; ++j) {
-          (*curGrid)(i, j, 0).V += vec3{0.0f, 18.0f, 0.0f};
+
+    Grid& g = *curGrid;
+    if (g.totalQuantity() < 1000000) {
+      const size_t dim_x = g.xDim();
+      const size_t dim_y = g.yDim();
+      const size_t dim_z = g.zDim();
+      for (size_t i = 0; i < dim_x; ++i) {
+        for (size_t j = 0; j < dim_y; ++j) {
+          for (size_t k = 0; k < dim_z; ++k) {
+            if (i >= dim_x/2 - 5 && i <= dim_x/2 + 5 &&
+                j >= dim_y/2 - 5 && j <= dim_y/2 + 5) {
+              g(i, j, k).quantity() += frand(25,50);
+              g(i, j, k).Te += frand(10, 40.0);
+            }
+          }
+        }
       }
-      for (size_t j = 50; j < 55; ++j) {
-          (*curGrid)(i, j, 0).V += vec3{0.0f, 18.0f, 0.0f};
-      }
-    }*/
+    }
+    cout << g.totalQuantity() << endl;
 }
 
 void Fluid::swap()
