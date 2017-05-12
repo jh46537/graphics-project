@@ -181,18 +181,28 @@ Cell Grid::bilerp(vec3 pos) const
     size_t x2 = clamp(ceil (pos.x), 0.0f, float(dim_x - 1));
     size_t y1 = clamp(floor(pos.y), 0.0f, float(dim_y - 1));
     size_t y2 = clamp(ceil (pos.y), 0.0f, float(dim_y - 1));
+    size_t z1 = clamp(floor(pos.z), 0.0f, float(dim_z - 1));
+    size_t z2 = clamp(ceil (pos.z), 0.0f, float(dim_z - 1));
 
     float x_amt = pos.x - x1;
     float y_amt = pos.y - y1;
-    size_t z    = dim_z / 2;
+    float z_amt = pos.z - z1;
 
-    vec3 v_x1 = mix(self(x1, y1, z).V, self(x2, y1, z).V, x_amt);
-    vec3 v_x2 = mix(self(x1, y2, z).V, self(x2, y2, z).V, x_amt);
-    vec3 v    = mix(v_x1, v_x2, y_amt);
+    vec3 v_00 = mix(self(x1, y1, z1).V, self(x2, y1, z1).V, x_amt);
+    vec3 v_01 = mix(self(x1, y2, z1).V, self(x2, y2, z1).V, x_amt);
+    vec3 v_10 = mix(self(x1, y1, z2).V, self(x2, y1, z2).V, x_amt);
+    vec3 v_11 = mix(self(x1, y2, z2).V, self(x2, y2, z2).V, x_amt);
+    vec3 v_0  = mix(v_00, v_01, y_amt);
+    vec3 v_1  = mix(v_10, v_11, y_amt);
+    vec3 v    = mix(v_0, v_1, z_amt);
 
-    float q_x1 = mix(self(x1, y1, z).Q, self(x2, y1, z).Q, x_amt);
-    float q_x2 = mix(self(x1, y2, z).Q, self(x2, y2, z).Q, x_amt);
-    float q    = mix(q_x1, q_x2, y_amt);
+    float q_00 = mix(self(x1, y1, z1).Q, self(x2, y1, z1).Q, x_amt);
+    float q_01 = mix(self(x1, y2, z1).Q, self(x2, y2, z1).Q, x_amt);
+    float q_10 = mix(self(x1, y1, z2).Q, self(x2, y1, z2).Q, x_amt);
+    float q_11 = mix(self(x1, y2, z2).Q, self(x2, y2, z2).Q, x_amt);
+    float q_0  = mix(q_00, q_01, y_amt);
+    float q_1  = mix(q_10, q_11, y_amt);
+    float q    = mix(q_0, q_1, z_amt);
 
     float t_x1 = mix(self(x1, y1, z).Te, self(x2, y1, z).Te, x_amt);
     float t_x2 = mix(self(x1, y2, z).Te, self(x2, y2, z).Te, x_amt);
@@ -203,12 +213,13 @@ Cell Grid::bilerp(vec3 pos) const
 
 void Grid::calc_divergence()
 {
-    for (size_t k = 0; k < dim_z; ++k) {
+    for (size_t k = 0; k < dim_z - 1; ++k) {
         // inner cells
-        for (size_t i = 1; i < dim_x - 1; ++i) {
-            for (size_t j = 1; j < dim_y - 1; ++j) {
-                self(i, j, k).D = ((self(i + 1, j    , k).V.x - self(i, j, k).V.x)
-                                 + (self(i    , j + 1, k).V.y - self(i, j, k).V.y)) / dx;
+        for (size_t i = 0; i < dim_x - 1; ++i) {
+            for (size_t j = 0; j < dim_y - 1; ++j) {
+                self(i, j, k).D = ((self(i + 1, j    , k    ).V.x - self(i, j, k).V.x)
+                                 + (self(i    , j + 1, k    ).V.y - self(i, j, k).V.y)
+                                 + (self(i    , j    , k + 1).V.z - self(i, j, k).V.z)) / dx;
             }
         }
 
@@ -228,5 +239,11 @@ void Grid::calc_divergence()
         self(0        , dim_y - 1, k).D = self(1        , dim_y - 2, k).D;
         self(dim_x - 1, 0        , k).D = self(dim_x - 2, 1        , k).D;
         self(dim_x - 1, dim_y - 1, k).D = self(dim_x - 2, dim_y - 2, k).D;
+    }
+    for (size_t i = 0; i < dim_x; ++i) {
+      for (size_t j = 0; j < dim_y; ++j) {
+        self(i, j, 0).D = self(i, j, 1).D;
+        self(i, j, dim_z - 1).D = self(i, j, dim_z - 2).D;
+      }
     }
 }

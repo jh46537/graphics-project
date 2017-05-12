@@ -375,7 +375,7 @@ Window::Window(
         exit(-1);
     }
 
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);

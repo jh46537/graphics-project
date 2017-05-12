@@ -69,17 +69,22 @@ void Fluid::step(const float dt)
     advect(dt);
     swap();
     forces(dt);
-    mesh(dt);
+    //mesh(dt);
     project(dt);
     swap();
 
+    const size_t X = curGrid->xDim();
+    const size_t Y = curGrid->yDim();
+    const size_t Z = curGrid->zDim();
     // Create conditions for nice looking simulation =)
-    for (size_t i = 0; i < 100; ++i) {
-        for (size_t j = 0; j < 100; ++j) {
-            vec3 pos = vec3(i, j, 0) - (*curGrid)(i, j, 0).V * dt;
-            (*workingGrid)(i, j, 0).Q = (*curGrid).bilerp(pos).Q;
-            (*workingGrid)(i, j, 0).Te = (*curGrid).bilerp(pos).Te;
-            (*workingGrid)(i, j, 0).V = (*curGrid).bilerp(pos).V;
+    for (size_t i = 0; i < X; ++i) {
+        for (size_t j = 0; j < Y; ++j) {
+            for (size_t k = 0; k < Z; ++k) {
+                vec3 pos = vec3(i, j, k) - (*curGrid)(i, j, k).V * dt;
+                (*workingGrid)(i, j, k).Q = (*curGrid).bilerp(pos).Q;
+                (*workingGrid)(i, j, k).Te = (*curGrid).bilerp(pos).Te;
+                (*workingGrid)(i, j, k).V = (*curGrid).bilerp(pos).V;
+            }
         }
     }
     swap();
@@ -91,8 +96,9 @@ void Fluid::step(const float dt)
     for (size_t i = 0; i < dim_x; ++i) {
       for (size_t j = 0; j < dim_y; ++j) {
         for (size_t k = 0; k < dim_z; ++k) {
-          if (i >= dim_x/2 - 5 && i <= dim_x/2 + 5 &&
-              j >= dim_y/2 - 5 && j <= dim_y/2 + 5) {
+          if (i >= X/2 - 5 && i <= X/2 + 5 &&
+              j >= Y/2 - 5 && j <= Y/2 + 5 &&
+              k >= Z/2 - 5 && k <= Z/2 + 5) {
             if (g.totalQuantity() < 1000000) {
               g(i, j, k).quantity() += frand(25,35);
               g(i, j, k).Te += frand(10, 40.0);
@@ -100,7 +106,8 @@ void Fluid::step(const float dt)
             float scale = 1.0f;
             float xmv = frand(-scale, scale);
             float ymv = frand(-scale, scale);
-            g(i, j, k).V += dt * vec3(xmv, ymv, 0);
+            float zmv = frand(-scale, scale);
+            g(i, j, k).V += dt * vec3(xmv, ymv, zmv);
           }
         }
       }
@@ -150,6 +157,13 @@ void Fluid::advect(const float dt)
         h(X - 1, 0    , k).V = b_scale * h(X - 2, 1    , k).V;
         h(X - 1, Y - 1, k).V = b_scale * h(X - 2, Y - 2, k).V;
     }
+    for (size_t i = 0; i < X; i++) {
+        for (size_t j = 1; j < Y - 1; ++j) {
+            h(i, j, 0).V = -1.0f * h(i, j, 1).V;
+            h(i, j, Z - 1).V = -1.0f * h(i, j, Z - 2).V;
+        }
+    }
+
 }
 
 // TODO: test for convergence
@@ -182,9 +196,10 @@ void Fluid::project(const float dt)
             // inner cells
             for (size_t i = 1; i < X - 1; ++i) {
                 for (size_t j = 1; j < Y - 1; ++j) {
-                    q[i][j][k] = ((p[i - 1][j    ][k] + p[i + 1][j    ][k] +
-                                   p[i    ][j - 1][k] + p[i    ][j + 1][k])
-                                 - (g(i, j, k).D * (dx * dx))) / 4.0f;
+                    q[i][j][k] = ((p[i-1][j  ][k  ] + p[i+1][j  ][k  ] +
+                                   p[i  ][j-1][k  ] + p[i  ][j+1][k  ] +
+                                   p[i  ][j  ][k-1] + p[i  ][j  ][k+1])
+                                 - (g(i, j, k).D * pow(dx, 4))) / 6.0f;
                 }
             }
 
@@ -206,19 +221,25 @@ void Fluid::project(const float dt)
             q[X - 1][Y - 1][k] = q[X - 2][Y - 2][k];
         }
 
+        for (size_t i = 0; i < X; ++i) {
+          for (size_t j = 0; j < Y; ++j) {
+            q[i][j][0] = q[i][j][1];
+            q[i][j][Z-1] = q[i][j][Z-2];
+          }
+        }
         // swap
         std::swap(p, q);
     }
 
     /* velocity -= gradient */
-    for (size_t k = 0; k < Z; ++k) {
+    for (size_t k = 1; k < Z - 1; ++k) {
         for (size_t i = 1; i < X - 1; ++i) {
             for (size_t j = 1; j < Y - 1; ++j) {
                 h(i, j, k).V = g(i, j, k).V -
                     vec3{
-                          p[i][j][k] - p[i - 1][j    ][k]
-                        , p[i][j][k] - p[i    ][j - 1][k]
-                        , 0.0f
+                          p[i][j][k] - p[i - 1][j    ][k    ]
+                        , p[i][j][k] - p[i    ][j - 1][k    ]
+                        , p[i][j][k] - p[i    ][j    ][k - 1]
                     } / dx;
             }
         }

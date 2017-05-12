@@ -45,15 +45,15 @@ constexpr float speed_t   = 0.01f;
 constexpr float speed_p   = 0.01f;
 constexpr float speed_div = 0.10f;
 
-constexpr size_t N     = 100;
+constexpr size_t N     = 30;
 constexpr size_t dim_x = N;
 constexpr size_t dim_y = N;
-constexpr size_t dim_z = 1;
+constexpr size_t dim_z = 10;
 constexpr float  dx    = 1.0 / N;
 
 using clk                  = std::chrono::system_clock;
 constexpr uint64_t fps     = 30;
-constexpr uint64_t t_unit  = clk::period::den / clk::period::num;
+constexpr uint64_t t_unit  = 1.0;//clk::period::den / clk::period::num;
 constexpr auto     t_frame = clk::duration(static_cast<uint64_t>((1.0 / fps) * t_unit));
 
 constexpr float max_quantity = 1000;
