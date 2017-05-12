@@ -69,6 +69,7 @@ void Fluid::step(const float dt)
             vec3 pos = vec3(i, j, 0) - (*curGrid)(i, j, 0).V * dt;
             (*workingGrid)(i, j, 0).Q = (*curGrid).bilerp(pos).Q;
             (*workingGrid)(i, j, 0).Te = (*curGrid).bilerp(pos).Te;
+            (*workingGrid)(i, j, 0).V = (*curGrid).bilerp(pos).V;
         }
     }
     swap();
