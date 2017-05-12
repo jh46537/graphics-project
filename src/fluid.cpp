@@ -54,6 +54,16 @@ const Grid& Fluid::getGrid() const
     return *curGrid;
 }
 
+using std::cout;
+using std::cerr;
+using std::endl;
+using std::vector;
+using std::function;
+using std::max;
+static float frand(float min = 0.0, float max = 1.0)
+{
+  return float(rand())/float(RAND_MAX) * (max - min) + min;
+}
 void Fluid::step(const float dt)
 {
     advect(dt);
@@ -107,6 +117,7 @@ void Fluid::advect(const float dt)
     const size_t X = g.xDim();
     const size_t Y = g.yDim();
     const size_t Z = g.zDim();
+    const float b_scale = -2.0f;
 
 
     for (size_t k = 0; k < Z; ++k) {
@@ -120,20 +131,20 @@ void Fluid::advect(const float dt)
 
         // edge cells
         for (size_t i = 1; i < X - 1; ++i) {
-            h(i, 0    , k).V = -1.0f * h(i, 1    , k).V;
-            h(i, Y - 1, k).V = -1.0f * h(i, Y - 2, k).V;
+            h(i, 0    , k).V = b_scale * h(i, 1    , k).V;
+            h(i, Y - 1, k).V = b_scale * h(i, Y - 2, k).V;
         }
 
         for (size_t j = 1; j < Y - 1; ++j) {
-            h(0    , j, k).V = -1.0f * h(1    , j, k).V;
-            h(X - 1, j, k).V = -1.0f * h(X - 2, j, k).V;
+            h(0    , j, k).V = b_scale * h(1    , j, k).V;
+            h(X - 1, j, k).V = b_scale * h(X - 2, j, k).V;
         }
 
         // corner cells
-        h(0    , 0    , k).V = -1.0f * h(1    , 1    , k).V;
-        h(0    , Y - 1, k).V = -1.0f * h(1    , Y - 2, k).V;
-        h(X - 1, 0    , k).V = -1.0f * h(X - 2, 1    , k).V;
-        h(X - 1, Y - 1, k).V = -1.0f * h(X - 2, Y - 2, k).V;
+        h(0    , 0    , k).V = b_scale * h(1    , 1    , k).V;
+        h(0    , Y - 1, k).V = b_scale * h(1    , Y - 2, k).V;
+        h(X - 1, 0    , k).V = b_scale * h(X - 2, 1    , k).V;
+        h(X - 1, Y - 1, k).V = b_scale * h(X - 2, Y - 2, k).V;
     }
 }
 
@@ -213,7 +224,7 @@ void Fluid::project(const float dt)
 void Fluid::forces(const float dt)
 {
     float alpha = 3.7453;
-    float beta = 0.1453;
+    float beta = 0.1453 * 5;
     float grav = -9.08;
     float total_accel = 0.0;
 
@@ -244,8 +255,7 @@ void Fluid::forces(const float dt)
           nu[i][j][k] = vec3(0.0, 0.0, 0.0);
           psi[i][j][k] = vec3(0.0, 0.0, 0.0);
           if(g(i, j, k).Q != 0.0){
-            total_accel = (-alpha * (g(i, j, k).Q / max_quantity * 0.8) - beta * (300 - g(i,j,k).Te));// / (g(i, j, k).Q / max_quantity * 0.8 * dx * dx + 1.0 );
-            total_accel += 0.001 * grav;
+            total_accel = (-alpha * (g(i, j, k).Q / max_quantity * 0.8) - beta * (300 - g(i,j,k).Te)) / (g(i, j, k).Q / max_quantity * 0.8 * dx * dx + 1.0 );
             g(i, j, k).V += vec3(0.0, (total_accel * dt), 0.0);
           }
         }

@@ -1,8 +1,14 @@
 #include "main.h"
 
+float frand(float min = 0.0, float max = 1.0)
+{
+  return float(rand())/float(RAND_MAX) * (max - min) + min;
+}
+
 int main(int argc, char** argv)
 {
     uvec3 dim{ dim_x, dim_y, dim_z };
+    srand(time(NULL));
 
     /*
      * x:   -1 (left)             ->  +1 (right)
@@ -14,19 +20,9 @@ int main(int argc, char** argv)
         for (size_t i = 0; i < dim_x; ++i) {
             for (size_t j = 0; j < dim_y; ++j) {
                 for (size_t k = 0; k < dim_z; ++k) {
-                    if (i >= dim_x / 4 && i < max<size_t>(dim_x * 3 / 4, 1) &&
-                        j >= dim_y / 4 && j < max<size_t>(dim_y * 3 / 4, 1) &&
-                        k >= dim_z / 4 && k < max<size_t>(dim_z * 3 / 4, 1)) {
-                        g(i, j, k).quantity() = max_quantity/2;
-                        g(i, j, k).Te = 350.0;
-                    }
-                    else {
-                        //g(i, j, k).quantity() = max_quantity / 2;
-                        g(i, j, k).Te = 300.0;
-                    }
-                    float r1 = (float(rand()) / float(RAND_MAX)) * 2.0 - 1.0;
-                    float r2 = float(rand()) / float(RAND_MAX) * 2.0 - 1.0;
-                    float r3 = float(rand()) / float(RAND_MAX) * 2.0 - 1.0;
+                    float r1 = frand(-5.0, 5.0);
+                    float r2 = frand(-5.0, 5.0);
+                    float r3 = frand(-5.0, 5.0);
                     g(i, j, k).velocity() = vec3{ r1 * 5.0, r2 * 5.0, r3 * 5.0 };
                 }
             }
