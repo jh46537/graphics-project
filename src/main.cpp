@@ -17,7 +17,7 @@ int main(int argc, char** argv)
                     if (i >= dim_x / 4 && i < max<size_t>(dim_x * 3 / 4, 1) &&
                         j >= dim_y / 4 && j < max<size_t>(dim_y * 3 / 4, 1) &&
                         k >= dim_z / 4 && k < max<size_t>(dim_z * 3 / 4, 1)) {
-                        g(i, j, k).quantity() = max_quantity;
+                        g(i, j, k).quantity() = max_quantity/2;
                     }
                     else {
                         //g(i, j, k).quantity() = max_quantity / 2;

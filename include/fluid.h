@@ -8,12 +8,13 @@ class Fluid
     Grid* curGrid;
     Grid* workingGrid;
 
-    using float3 = vector<vector<vector<float>>>;
-    float3 p;
-    float3 q;
-    vec3* omega;
-    vec3* nu;
-    vec3* psi;
+    template <typename T>
+    using field = vector<vector<vector<T>>>;
+    field<float> p;
+    field<float> q;
+    field<vec3> omega;
+    field<vec3> nu;
+    field<vec3> psi;
 
     float vorticity_epsilon = 0.01;
     void swap();
