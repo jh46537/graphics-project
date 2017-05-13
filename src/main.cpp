@@ -17,6 +17,7 @@ int main(int argc, char** argv)
      */
     function<void (Grid&)> setup = [] (Grid& g)
     {
+#pragma omp parallel for
         for (size_t i = 0; i < dim_x; ++i) {
             for (size_t j = 0; j < dim_y; ++j) {
                 for (size_t k = 0; k < dim_z; ++k) {
@@ -61,28 +62,32 @@ int main(int argc, char** argv)
      */
     float dt         = 1.0f;
     auto t_render    = clk::now();
-    size_t num_ticks = 10;          // initialize > 0
+    size_t num_ticks = 0;          // initialize > 0
 
+    auto tt_start = clk::now();
     while (w->alive()) {
-        if (clk::now() > t_render) {
-            t_render += t_frame;
-            auto t_start = clk::now();
-            w->render(*v, *sim, mvp_loc);
-            auto t_end   = clk::now();
-            cout << "[render after " << num_ticks << " simulations]" << endl;
-            cout << "[render took " << (t_end - t_start).count() << " ns]" << endl;
-            dt = 1.0 / (fps * num_ticks);
-            num_ticks = 0;
-        }
+        //if (clk::now() > t_render) {
+        //    t_render += t_frame;
+        //    auto t_start = clk::now();
+        //    w->render(*v, *sim, mvp_loc);
+        //    auto t_end   = clk::now();
+        //    cout << "[render after " << num_ticks << " simulations]" << endl;
+        //    cout << "[render took " << (t_end - t_start).count() << " ns]" << endl;
+        //    dt = 1.0 / (fps * num_ticks);
+        //    num_ticks = 0;
+        //}
 
-        //auto t_start = clk::now();
+        auto t_start = clk::now();
         sim->step(dt);
-        //auto t_end   = clk::now();
+        auto t_end   = clk::now();
 
         ////dt = (t_end - t_start).count() / static_cast<float>(t_unit);
         //cout << "[simulation took " << (t_end - t_start).count() << " ns]" << endl;
         ++num_ticks;
+        if (num_ticks >= 1000) break;
     }
+    auto tt_end   = clk::now();
+    cout << "[simulation took an average of " << (tt_end - tt_start).count() / 1000 / 1e6 << " ms]" << endl;
 
     delete(v);
     delete(s);

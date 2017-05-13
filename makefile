@@ -18,6 +18,10 @@ EXEC = smoke
 all: $(OBJD) $(OBJS)
 	$(CC) $(OBJS) -o $(EXEC) $(LFLG) $(LIBS)
 
+openmp: CFLG += -fopenmp
+openmp: LFLG += -fopenmp
+openmp: all
+
 -include $(DEPS)
 
 $(OBJD)/%.o: $(SRCD)/%.cpp

@@ -71,6 +71,7 @@ VoxelGrid::VoxelGrid(const Grid& g)
 
     num_vertices = sizeof(voxel_vertices) / sizeof(vec3);
     vertices = vector<vec3>( num_cells * num_vertices );
+#pragma omp parallel for
     for (size_t i = 0; i < num_cells; ++i) {
         for (size_t j = 0; j < num_vertices; ++j) {
             vertices[i * num_vertices + j] = vec3{ g[i].mvp() * vec4{ voxel_vertices[j], 1.0f } };
@@ -113,6 +114,7 @@ VoxelGrid::VoxelGrid(const Grid& g)
     size_t num_indices = sizeof(voxel_indices) / sizeof(GLuint);
     index_size = num_cells * num_indices;
     indices = vector<GLuint>( index_size );
+#pragma omp parallel for
     for (size_t i = 0; i < num_cells; ++i) {
         for (size_t j = 0; j < num_indices; ++j) {
             indices[i * num_indices + j] = i * num_vertices + voxel_indices[j];
@@ -152,6 +154,7 @@ VoxelGrid::~VoxelGrid()
 void VoxelGrid::render(const Grid& g)
 {
     size_t size = g.size();
+#pragma omp parallel for
     for (size_t i = 0; i < size; ++i)
         for (size_t j = 0; j < num_vertices; ++j)
             if (!draw_velocity)
@@ -261,6 +264,7 @@ GLint Shader::uniform(const char* name) const
 
 void Shader::bind_attrib(const vector<const char*>& names) const
 {
+#pragma omp parallel for
     for (size_t i = 0; i < names.size(); ++i) {
         glBindAttribLocation(program, i, names[i]);
     }

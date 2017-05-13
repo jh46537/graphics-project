@@ -95,6 +95,7 @@ void Fluid::step(const float dt)
     swap();
 
     Grid& g = *curGrid;
+#pragma omp parallel for
     for (size_t i = 0; i < X; ++i) {
       for (size_t j = 0; j < Y; ++j) {
         for (size_t k = 0; k < Z; ++k) {
@@ -112,7 +113,7 @@ void Fluid::step(const float dt)
         }
       }
     }
-    cout << g.totalQuantity() << endl;
+    //cout << g.totalQuantity() << endl;
 }
 
 void Fluid::swap()
@@ -131,6 +132,7 @@ void Fluid::advect(const float dt)
     const float b_scale = -1.0f;
 
 
+#pragma omp parallel for
     for (size_t k = 0; k < Z; ++k) {
         // inner cells
         for (size_t i = 0; i < X; ++i) {
@@ -173,6 +175,7 @@ void Fluid::project(const float dt)
 
 
     g.calc_divergence();
+#pragma omp parallel for
     for (size_t i = 0; i < X; ++i) {
       for (size_t j = 0; j < Y; ++j) {
         for (size_t k = 0; k < Z; ++k) {
@@ -185,6 +188,7 @@ void Fluid::project(const float dt)
     /* Laplace - Jacobi iteration */
     for (size_t n = 0; n < convergence; ++n) {
         // single iteration
+#pragma omp parallel for
         for (size_t k = 0; k < Z; ++k) {
             // inner cells
             for (size_t i = 1; i < X - 1; ++i) {
@@ -218,6 +222,7 @@ void Fluid::project(const float dt)
     }
 
     /* velocity -= gradient */
+#pragma omp parallel for
     for (size_t k = 0; k < Z; ++k) {
         for (size_t i = 1; i < X - 1; ++i) {
             for (size_t j = 1; j < Y - 1; ++j) {
@@ -247,6 +252,7 @@ void Fluid::forces(const float dt)
 
     const float dx = g.getDx();
 
+#pragma omp parallel for
     for (size_t k = 1; k < Z - 1; ++k) {
         for (size_t i = 1; i < X - 1; ++i) {
             for (size_t j = 1; j < Y - 1; ++j) {
@@ -259,6 +265,7 @@ void Fluid::forces(const float dt)
         }
     }
 
+#pragma omp parallel for
     for (size_t i = 0; i < X; ++i) {
       for (size_t j = 0; j < Y; ++j) {
         for (size_t k = 0; k < Z; ++k) {
@@ -287,6 +294,7 @@ void Fluid::forces(const float dt)
     */
 
 
+#pragma omp parallel for
     for (size_t k = 1; k < Z - 1; ++k) {
         for (size_t i = 1; i < X - 1; ++i) {
             for (size_t j = 1; j < Y - 1; ++j) {
@@ -321,6 +329,7 @@ void Fluid::mesh(const float dt)
 
     const float dx = g.getDx();
 
+#pragma omp parallel for
     for (size_t i = 1; i < X - 1; ++i) {
         for (size_t j = 1; j < Y - 1; ++j) {
             vec3 dist = vec3(X/2,Y/2,0) - vec3(i,j,0);
