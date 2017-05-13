@@ -204,9 +204,13 @@ Cell Grid::bilerp(vec3 pos) const
     float q_1  = mix(q_10, q_11, y_amt);
     float q    = mix(q_0, q_1, z_amt);
 
-    float t_x1 = mix(self(x1, y1, z).Te, self(x2, y1, z).Te, x_amt);
-    float t_x2 = mix(self(x1, y2, z).Te, self(x2, y2, z).Te, x_amt);
-    float t    = mix(t_x1, t_x2, y_amt);
+    float t_00 = mix(self(x1, y1, z1).Te, self(x2, y1, z1).Te, x_amt);
+    float t_01 = mix(self(x1, y2, z1).Te, self(x2, y2, z1).Te, x_amt);
+    float t_10 = mix(self(x1, y1, z2).Te, self(x2, y1, z2).Te, x_amt);
+    float t_11 = mix(self(x1, y2, z2).Te, self(x2, y2, z2).Te, x_amt);
+    float t_0  = mix(t_00, t_01, y_amt);
+    float t_1  = mix(t_10, t_11, y_amt);
+    float t    = mix(t_0, t_1, z_amt);
 
     return Cell( v, q, t );
 }

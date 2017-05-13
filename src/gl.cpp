@@ -33,7 +33,7 @@ using glm::lookAt;
 constexpr float pi = M_PI;
 constexpr size_t log_size = 1024;
 
-constexpr bool draw_velocity = false;
+constexpr bool draw_velocity = true;
 constexpr float max_velocity = 50.0;
 
 /*
@@ -375,15 +375,15 @@ Window::Window(
         exit(-1);
     }
 
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-    glEnable(GL_DEPTH_TEST);
+//    glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    glEnable(GL_CULL_FACE);
+//    glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     glFrontFace(GL_CCW);
 }

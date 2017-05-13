@@ -20,10 +20,10 @@ int main(int argc, char** argv)
         for (size_t i = 0; i < dim_x; ++i) {
             for (size_t j = 0; j < dim_y; ++j) {
                 for (size_t k = 0; k < dim_z; ++k) {
-                    float r1 = frand(-5.0, 5.0);
-                    float r2 = frand(-5.0, 5.0);
-                    float r3 = frand(-5.0, 5.0);
-                    g(i, j, k).velocity() = vec3{ r1 * 5.0, r2 * 5.0, r3 * 5.0 };
+                    float r1 = frand(-1.0, 1.0);
+                    float r2 = frand(-1.0, 1.0);
+                    float r3 = frand(-1.0, 1.0);
+                    g(i, j, k).velocity() = vec3{ r1 * 1.0, r2 * 1.0, r3 * 1.0 };
                 }
             }
         }

@@ -68,8 +68,8 @@ void Fluid::step(const float dt)
 {
     advect(dt);
     swap();
-    forces(dt);
-    //mesh(dt);
+    //forces(dt);
+    mesh(dt);
     project(dt);
     swap();
 
@@ -81,9 +81,10 @@ void Fluid::step(const float dt)
         for (size_t j = 0; j < Y; ++j) {
             for (size_t k = 0; k < Z; ++k) {
                 vec3 pos = vec3(i, j, k) - (*curGrid)(i, j, k).V * dt;
-                (*workingGrid)(i, j, k).Q = (*curGrid).bilerp(pos).Q;
-                (*workingGrid)(i, j, k).Te = (*curGrid).bilerp(pos).Te;
-                (*workingGrid)(i, j, k).V = (*curGrid).bilerp(pos).V;
+                Grid::Cell c = (*curGrid).bilerp(pos);
+                (*workingGrid)(i, j, k).Q = c.Q;
+                (*workingGrid)(i, j, k).Te = c.Te;
+                (*workingGrid)(i, j, k).V = (*curGrid)(i, j, k).V;
             }
         }
     }
@@ -96,18 +97,19 @@ void Fluid::step(const float dt)
     for (size_t i = 0; i < dim_x; ++i) {
       for (size_t j = 0; j < dim_y; ++j) {
         for (size_t k = 0; k < dim_z; ++k) {
-          if (i >= X/2 - 5 && i <= X/2 + 5 &&
-              j >= Y/2 - 5 && j <= Y/2 + 5 &&
-              k >= Z/2 - 5 && k <= Z/2 + 5) {
-            if (g.totalQuantity() < 1000000) {
-              g(i, j, k).quantity() += frand(25,35);
-              g(i, j, k).Te += frand(10, 40.0);
+          if (i >= X/2 - 1 && i <= X/2 + 1 &&
+              j >= Y/2 - 1 && j <= Y/2 + 1 &&
+              k >= Z/2 - 1 && k <= Z/2 + 1) {
+            if (g.totalQuantity() < 10000) {
+              g(i, j, k).quantity() += frand(10,20);
+              g(i, j, k).Te += frand(30, 40.0);
             }
-            float scale = 1.0f;
+            float scale = 10.0f;
             float xmv = frand(-scale, scale);
             float ymv = frand(-scale, scale);
             float zmv = frand(-scale, scale);
             g(i, j, k).V += dt * vec3(xmv, ymv, zmv);
+            g(i, j, k).V += dt * vec3(100.0f, 0.0f, 0.0f);
           }
         }
       }
@@ -128,7 +130,7 @@ void Fluid::advect(const float dt)
     const size_t X = g.xDim();
     const size_t Y = g.yDim();
     const size_t Z = g.zDim();
-    const float b_scale = -1.0f;
+    const float b_scale = -5.0f;
 
 
     for (size_t k = 0; k < Z; ++k) {
@@ -158,9 +160,9 @@ void Fluid::advect(const float dt)
         h(X - 1, Y - 1, k).V = b_scale * h(X - 2, Y - 2, k).V;
     }
     for (size_t i = 0; i < X; i++) {
-        for (size_t j = 1; j < Y - 1; ++j) {
-            h(i, j, 0).V = -1.0f * h(i, j, 1).V;
-            h(i, j, Z - 1).V = -1.0f * h(i, j, Z - 2).V;
+        for (size_t j = 0; j < Y; ++j) {
+            h(i, j, 0).V = b_scale * h(i, j, 1).V;
+            h(i, j, Z - 1).V = b_scale * h(i, j, Z - 2).V;
         }
     }
 
@@ -248,7 +250,7 @@ void Fluid::project(const float dt)
 
 void Fluid::forces(const float dt)
 {
-    float alpha = 3.7453 * 2;
+    float alpha = 3.7453 * 0.25;
     float beta = 0.1453 * 2;
     float grav = -9.08;
     float total_accel = 0.0;
@@ -286,6 +288,7 @@ void Fluid::forces(const float dt)
         }
       }
     }
+    return;
     /*
     float averagedensity = 0.0;
     for (size_t i = 1; i < X-1; ++i) {
@@ -324,7 +327,7 @@ void Fluid::forces(const float dt)
     }
 }
 
-constexpr float radius = 30.0;
+constexpr float radius = 5.0;
 void Fluid::mesh(const float dt)
 {
     Grid& g = *curGrid;
@@ -337,14 +340,16 @@ void Fluid::mesh(const float dt)
 
     for (size_t i = 1; i < X - 1; ++i) {
         for (size_t j = 1; j < Y - 1; ++j) {
-            vec3 dist = vec3(X/2,Y/2,0) - vec3(i,j,0);
+        for (size_t k = 1; k < Z - 1; ++k) {
+            vec3 dist = vec3(X/2,Y/2,Z/2) - vec3(i,j,k);
             if (length(dist) > radius) {
                 dist.x *= abs(dist.x);
                 dist.y *= abs(dist.y);
                 dist.z *= abs(dist.z);
-                g(i,j,0).V *= 0.1f;
-                g(i,j,0).V += dt * (1.f * (dist) * g(i,j,0).Q / max_quantity);
+                g(i,j,k).V *= 0.1f;
+                g(i,j,k).V += dt * (1.f * (dist) * g(i,j,k).Q / max_quantity);
             }
+        }
         }
     }
 }
