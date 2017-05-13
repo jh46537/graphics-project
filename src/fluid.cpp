@@ -69,7 +69,7 @@ void Fluid::step(const float dt)
     advect(dt);
     swap();
     forces(dt);
-    //swap();
+    mesh(dt);
     project(dt);
     swap();
 
@@ -85,18 +85,22 @@ void Fluid::step(const float dt)
     swap();
 
     Grid& g = *curGrid;
-    if (g.totalQuantity() < 1000000) {
-      const size_t dim_x = g.xDim();
-      const size_t dim_y = g.yDim();
-      const size_t dim_z = g.zDim();
-      for (size_t i = 0; i < dim_x; ++i) {
-        for (size_t j = 0; j < dim_y; ++j) {
-          for (size_t k = 0; k < dim_z; ++k) {
-            if (i >= dim_x/2 - 5 && i <= dim_x/2 + 5 &&
-                j >= dim_y/2 - 5 && j <= dim_y/2 + 5) {
-              g(i, j, k).quantity() += frand(25,50);
+    const size_t dim_x = g.xDim();
+    const size_t dim_y = g.yDim();
+    const size_t dim_z = g.zDim();
+    for (size_t i = 0; i < dim_x; ++i) {
+      for (size_t j = 0; j < dim_y; ++j) {
+        for (size_t k = 0; k < dim_z; ++k) {
+          if (i >= dim_x/2 - 5 && i <= dim_x/2 + 5 &&
+              j >= dim_y/2 - 5 && j <= dim_y/2 + 5) {
+            if (g.totalQuantity() < 1000000) {
+              g(i, j, k).quantity() += frand(25,35);
               g(i, j, k).Te += frand(10, 40.0);
             }
+            float scale = 1.0f;
+            float xmv = frand(-scale, scale);
+            float ymv = frand(-scale, scale);
+            g(i, j, k).V += dt * vec3(xmv, ymv, 0);
           }
         }
       }
@@ -117,7 +121,7 @@ void Fluid::advect(const float dt)
     const size_t X = g.xDim();
     const size_t Y = g.yDim();
     const size_t Z = g.zDim();
-    const float b_scale = -2.0f;
+    const float b_scale = -1.0f;
 
 
     for (size_t k = 0; k < Z; ++k) {
@@ -223,8 +227,8 @@ void Fluid::project(const float dt)
 
 void Fluid::forces(const float dt)
 {
-    float alpha = 3.7453;
-    float beta = 0.1453 * 5;
+    float alpha = 3.7453 * 2;
+    float beta = 0.1453 * 2;
     float grav = -9.08;
     float total_accel = 0.0;
 
@@ -294,6 +298,31 @@ void Fluid::forces(const float dt)
                 crossed.y *= vorticity_epsilon * dx * dt;
                 crossed.z *= vorticity_epsilon * dx * dt;
                 g(i, j, k).V += crossed;
+            }
+        }
+    }
+}
+
+constexpr float radius = 30.0;
+void Fluid::mesh(const float dt)
+{
+    Grid& g = *curGrid;
+
+    const size_t X = g.xDim();
+    const size_t Y = g.yDim();
+    const size_t Z = g.zDim();
+
+    const float dx = g.getDx();
+
+    for (size_t i = 1; i < X - 1; ++i) {
+        for (size_t j = 1; j < Y - 1; ++j) {
+            vec3 dist = vec3(X/2,Y/2,0) - vec3(i,j,0);
+            if (length(dist) > radius) {
+                dist.x *= abs(dist.x);
+                dist.y *= abs(dist.y);
+                dist.z *= abs(dist.z);
+                g(i,j,0).V *= 0.1f;
+                g(i,j,0).V += dt * (1.f * (dist) * g(i,j,0).Q / max_quantity);
             }
         }
     }

@@ -34,7 +34,7 @@ constexpr float pi = M_PI;
 constexpr size_t log_size = 1024;
 
 constexpr bool draw_velocity = false;
-constexpr float max_velocity = 200.0;
+constexpr float max_velocity = 50.0;
 
 /*
  * voxel
