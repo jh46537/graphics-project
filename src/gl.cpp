@@ -29,6 +29,7 @@ using glm::lookAt;
 #include "fluid.h"
 #include "gl.h"
 
+bool Window::mesh = true;
 
 constexpr float pi = M_PI;
 constexpr size_t log_size = 1024;
@@ -434,6 +435,8 @@ void Window::key_callback(GLFWwindow* window, int key, int scancode, int action,
         keys[key] = true;
     }
     else if (action == GLFW_RELEASE) {
+        if (key == GLFW_KEY_M)
+          Window::mesh = !Window::mesh;
         keys[key] = false;
     }
 }

@@ -12,6 +12,9 @@ using std::function;
 #include <glm/glm.hpp>
 #define GLM_FORCE_RADIANS
 #include <glm/gtc/matrix_transform.hpp>
+#include <GL/gl3w.h>
+#include <GLFW/glfw3.h>
+
 
 using glm::vec3;
 using glm::uvec3;
@@ -19,6 +22,7 @@ using glm::mat4;
 
 #include "grid.h"
 #include "fluid.h"
+#include "gl.h"
 
 constexpr float max_quantity = 1000.0f;
 
@@ -69,13 +73,17 @@ void Fluid::step(const float dt)
     advect(dt);
     swap();
     forces(dt);
-    mesh(dt);
+    if (Window::mesh)
+      mesh(dt);
     project(dt);
     swap();
 
+    size_t X = (*curGrid).xDim();
+    size_t Y = (*curGrid).yDim();
+    size_t Z = (*curGrid).zDim();
     // Create conditions for nice looking simulation =)
-    for (size_t i = 0; i < 100; ++i) {
-        for (size_t j = 0; j < 100; ++j) {
+    for (size_t i = 0; i < X; ++i) {
+        for (size_t j = 0; j < Y; ++j) {
             vec3 pos = vec3(i, j, 0) - (*curGrid)(i, j, 0).V * dt;
             (*workingGrid)(i, j, 0).Q = (*curGrid).bilerp(pos).Q;
             (*workingGrid)(i, j, 0).Te = (*curGrid).bilerp(pos).Te;
@@ -85,14 +93,11 @@ void Fluid::step(const float dt)
     swap();
 
     Grid& g = *curGrid;
-    const size_t dim_x = g.xDim();
-    const size_t dim_y = g.yDim();
-    const size_t dim_z = g.zDim();
-    for (size_t i = 0; i < dim_x; ++i) {
-      for (size_t j = 0; j < dim_y; ++j) {
-        for (size_t k = 0; k < dim_z; ++k) {
-          if (i >= dim_x/2 - 5 && i <= dim_x/2 + 5 &&
-              j >= dim_y/2 - 5 && j <= dim_y/2 + 5) {
+    for (size_t i = 0; i < X; ++i) {
+      for (size_t j = 0; j < Y; ++j) {
+        for (size_t k = 0; k < Z; ++k) {
+          if (i >= X/2 - 5 && i <= X/2 + 5 &&
+              j >= Y/2 - 5 && j <= Y/2 + 5) {
             if (g.totalQuantity() < 1000000) {
               g(i, j, k).quantity() += frand(25,35);
               g(i, j, k).Te += frand(10, 40.0);

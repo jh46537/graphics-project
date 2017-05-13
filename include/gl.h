@@ -85,6 +85,7 @@ class Window
 
 public:
 
+    static bool mesh;
     Window(size_t, size_t, size_t, size_t, const char*, float, float, float, float);
     ~Window();
 
