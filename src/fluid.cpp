@@ -19,6 +19,8 @@ using std::function;
 using glm::vec3;
 using glm::uvec3;
 using glm::mat4;
+using glm::length;
+using glm::cross;
 
 #include "grid.h"
 #include "fluid.h"
