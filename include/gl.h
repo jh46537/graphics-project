@@ -88,9 +88,8 @@ class Window
 
     static bool keys[512];
 
-    static bool   click;
-    static double mouse_start[2];
-    static double mouse_end[2];
+    static bool click;
+    size_t last_mouse_cell[2] = { (size_t)-1, (size_t)-1 };
 
 public:
 

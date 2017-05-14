@@ -37,7 +37,6 @@ int main(int argc, char** argv)
                     float r2 = frand(-5.0, 5.0);
                     float r3 = frand(-5.0, 5.0);
                     g(i, j, k).velocity() = vec3{ r1 * 5.0, r2 * 5.0, r3 * 5.0 };
-
                     float m_x, m_y;
                     mesh_f >> m_x;
                     mesh_f >> m_y;

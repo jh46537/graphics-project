@@ -470,40 +470,42 @@ void Window::handle_input()
     }
 
     if (click) {
+        double mouse_x;
+        double mouse_y;
+        glfwGetCursorPos(window, &mouse_x, &mouse_y);
+
         Grid& g = sim.getGrid();
 
-        size_t cell_x = (mouse_start[0] / width)      * g.xDim();
-        size_t cell_y = (1 - mouse_start[1] / height) * g.yDim();
-        //cout << cell_x << " " << cell_y << endl;;
+        size_t x = (mouse_x / width)      * g.xDim();
+        size_t y = (1 - mouse_y / height) * g.yDim();
 
-        float dv_x = (mouse_end[0] - mouse_start[0]) / width  * 100;
-        float dv_y = (mouse_start[1] - mouse_end[1]) / height * 100;
-        //cout << dv_x << " " << dv_y << endl;
+        if (!(x == last_mouse_cell[0] && y == last_mouse_cell[1])) {
+            last_mouse_cell[0] = x;
+            last_mouse_cell[1] = y;
+            cout << x << " " << y << endl;;
 
-        cout << cell_x << " " << cell_y << endl;
-        auto& v = g(cell_x, cell_y, 0).velocity();
-        cout << v.x << " " << v.y << " " << v.z << endl;
-        v += vec3{ dv_x, dv_y, 0.0f };
-        cout << v.x << " " << v.y << " " << v.z << endl;
+            float dv_x = float(rand())/float(RAND_MAX) * (50.0) - 25.0;
+            float dv_y = float(rand())/float(RAND_MAX) * (50.0) - 25.0;
+            cout << dv_x << " " << dv_y << endl;
 
-        click = false;
+            auto& v = g(x, y, 0).velocity();
+            cout << v.x << " " << v.y << " " << v.z << endl;
+            v += vec3{ dv_x, dv_y, 0.0f };
+            cout << v.x << " " << v.y << " " << v.z << endl;
+        }
     }
 }
 
 bool Window::click = false;
-double Window::mouse_start[2] = {false};
-double Window::mouse_end  [2] = {false};
 
 void Window::mouse_callback(GLFWwindow* window, int button, int action, int mods)
 {
     if (button == GLFW_MOUSE_BUTTON_LEFT) {
         if (action == GLFW_PRESS) {
-            glfwGetCursorPos(window, &mouse_start[0], &mouse_start[1]);
+            click = true;
         }
         else if (action == GLFW_RELEASE) {
-            glfwGetCursorPos(window, &mouse_end[0]  , &mouse_end[1]  );
-            click = true;
+            click = false;
         }
     }
 }
-

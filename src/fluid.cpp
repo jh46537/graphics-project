@@ -80,10 +80,10 @@ void Fluid::step(const float dt)
 {
     advect(dt);
     swap();
-    //forces(dt);
+    forces(dt);
     if (Window::mesh)
       mesh(dt);
-    //project(dt);
+    project(dt);
     swap();
 
     size_t X = (*curGrid).xDim();
@@ -104,8 +104,8 @@ void Fluid::step(const float dt)
     for (size_t i = 0; i < X; ++i) {
       for (size_t j = 0; j < Y; ++j) {
         for (size_t k = 0; k < Z; ++k) {
-          if (i >= X/2 - 1 && i <= X/2 + 1 &&
-              j >= Y/2 - 1 && j <= Y/2 + 1) {
+          if (i >= X/2 - 5 && i <= X/2 + 5 &&
+              j >= Y/2 - 5 && j <= Y/2 + 5) {
             if (g.totalQuantity() < 1000000) {
               g(i, j, k).quantity() += frand(25,35);
               g(i, j, k).Te += frand(10, 40.0);
