@@ -51,6 +51,8 @@ constexpr size_t dim_y = N;
 constexpr size_t dim_z = 1;
 constexpr float  dx    = 1.0 / N;
 
+constexpr float fov    = M_PI / 32;
+
 using clk                  = std::chrono::system_clock;
 constexpr uint64_t fps     = 30;
 constexpr uint64_t t_unit  = clk::period::den / clk::period::num;

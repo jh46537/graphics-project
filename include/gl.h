@@ -84,6 +84,7 @@ class Window
 
     Fluid& sim;
 
+    float fov;
     Camera camera;
 
     static bool keys[512];
@@ -94,7 +95,7 @@ class Window
 public:
 
     static bool mesh;
-    Window(size_t, size_t, size_t, size_t, const char*, Fluid&, float, float, float, float);
+    Window(size_t, size_t, size_t, size_t, const char*, Fluid&, float, float, float, float, float);
     ~Window();
 
     void start(const float, const GLint) const;

@@ -324,7 +324,7 @@ void Camera::in(bool slow)
 void Camera::out(bool slow)
 {
     float dr = speed_r * (slow ? speed_div : 1.0);
-    if (R + dr < 5)
+    if (R + dr < 100)
         R += dr;
 }
 
@@ -343,7 +343,8 @@ Window::Window(
     , float speed_t
     , float speed_p
     , float speed_div
-) : width(width), height(height), sim(sim), camera(1.0, pi, pi / 2, speed_r, speed_t, speed_p, speed_div)
+    , float fov
+) : width(width), height(height), sim(sim), fov(fov), camera(2 / fov, pi, pi / 2, speed_r, speed_t, speed_p, speed_div)
 {
     /* initialize window */
     if (!glfwInit()) {
@@ -420,7 +421,7 @@ void Window::render(VoxelGrid& v, Fluid& sim, const GLint mvp_loc)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     mat4 view = camera.view();
-    mat4 per  = perspective(pi / 2, 1.0f, 0.01f, 100.0f);
+    mat4 per  = perspective(fov, 1.0f, 0.01f, 100.0f);
     mat4 mvp  = per * view;
     glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, glm::value_ptr(mvp));
 

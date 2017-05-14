@@ -33,6 +33,7 @@ int main(int argc, char** argv)
         for (size_t i = 0; i < dim_x; ++i) {
             for (size_t j = 0; j < dim_y; ++j) {
                 for (size_t k = 0; k < dim_z; ++k) {
+                    //g(i, j, k).quantity() = max_quantity;
                     float r1 = frand(-5.0, 5.0);
                     float r2 = frand(-5.0, 5.0);
                     float r3 = frand(-5.0, 5.0);
@@ -58,6 +59,7 @@ int main(int argc, char** argv)
         , speed_t
         , speed_p
         , speed_div
+        , fov
     };
 
     Shader* s = new Shader;
