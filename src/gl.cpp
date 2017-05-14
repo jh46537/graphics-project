@@ -338,11 +338,12 @@ Window::Window(
     , size_t width
     , size_t height
     , const char* name
+    , Fluid& sim
     , float speed_r
     , float speed_t
     , float speed_p
     , float speed_div
-) : camera(1.0, pi, pi / 2, speed_r, speed_t, speed_p, speed_div)
+) : width(width), height(height), sim(sim), camera(1.0, pi, pi / 2, speed_r, speed_t, speed_p, speed_div)
 {
     /* initialize window */
     if (!glfwInit()) {
@@ -363,6 +364,7 @@ Window::Window(
     }
 
     glfwSetKeyCallback(window, Window::key_callback);
+    glfwSetMouseButtonCallback(window, Window::mouse_callback);
     glfwMakeContextCurrent(window);
 
 
@@ -409,7 +411,7 @@ bool Window::alive() const
     return !glfwWindowShouldClose(window);
 }
 
-void Window::render(VoxelGrid& v, const Fluid& sim, const GLint mvp_loc)
+void Window::render(VoxelGrid& v, Fluid& sim, const GLint mvp_loc)
 {
     const Grid& g = sim.getGrid();
 
@@ -466,4 +468,42 @@ void Window::handle_input()
     if (false                || keys[GLFW_KEY_E] || keys[GLFW_KEY_O]) {
         camera.out(slow);
     }
+
+    if (click) {
+        Grid& g = sim.getGrid();
+
+        size_t cell_x = (mouse_start[0] / width)      * g.xDim();
+        size_t cell_y = (1 - mouse_start[1] / height) * g.yDim();
+        //cout << cell_x << " " << cell_y << endl;;
+
+        float dv_x = (mouse_end[0] - mouse_start[0]) / width  * 100;
+        float dv_y = (mouse_start[1] - mouse_end[1]) / height * 100;
+        //cout << dv_x << " " << dv_y << endl;
+
+        cout << cell_x << " " << cell_y << endl;
+        auto& v = g(cell_x, cell_y, 0).velocity();
+        cout << v.x << " " << v.y << " " << v.z << endl;
+        v += vec3{ dv_x, dv_y, 0.0f };
+        cout << v.x << " " << v.y << " " << v.z << endl;
+
+        click = false;
+    }
 }
+
+bool Window::click = false;
+double Window::mouse_start[2] = {false};
+double Window::mouse_end  [2] = {false};
+
+void Window::mouse_callback(GLFWwindow* window, int button, int action, int mods)
+{
+    if (button == GLFW_MOUSE_BUTTON_LEFT) {
+        if (action == GLFW_PRESS) {
+            glfwGetCursorPos(window, &mouse_start[0], &mouse_start[1]);
+        }
+        else if (action == GLFW_RELEASE) {
+            glfwGetCursorPos(window, &mouse_end[0]  , &mouse_end[1]  );
+            click = true;
+        }
+    }
+}
+

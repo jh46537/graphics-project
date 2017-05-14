@@ -55,29 +55,24 @@ Fluid::~Fluid()
     delete(workingGrid);
 }
 
-const Grid& Fluid::getGrid() const
+Grid& Fluid::getGrid()
 {
     return *curGrid;
 }
 
-using std::cout;
-using std::cerr;
-using std::endl;
-using std::vector;
-using std::function;
-using std::max;
 static float frand(float min = 0.0, float max = 1.0)
 {
   return float(rand())/float(RAND_MAX) * (max - min) + min;
 }
+
 void Fluid::step(const float dt)
 {
     advect(dt);
     swap();
-    forces(dt);
+    //forces(dt);
     if (Window::mesh)
       mesh(dt);
-    project(dt);
+    //project(dt);
     swap();
 
     size_t X = (*curGrid).xDim();
@@ -98,8 +93,8 @@ void Fluid::step(const float dt)
     for (size_t i = 0; i < X; ++i) {
       for (size_t j = 0; j < Y; ++j) {
         for (size_t k = 0; k < Z; ++k) {
-          if (i >= X/2 - 5 && i <= X/2 + 5 &&
-              j >= Y/2 - 5 && j <= Y/2 + 5) {
+          if (i >= X/2 - 1 && i <= X/2 + 1 &&
+              j >= Y/2 - 1 && j <= Y/2 + 1) {
             if (g.totalQuantity() < 1000000) {
               g(i, j, k).quantity() += frand(25,35);
               g(i, j, k).Te += frand(10, 40.0);
@@ -112,7 +107,7 @@ void Fluid::step(const float dt)
         }
       }
     }
-    cout << g.totalQuantity() << endl;
+    //cout << g.totalQuantity() << endl;
 }
 
 void Fluid::swap()
@@ -236,7 +231,7 @@ void Fluid::forces(const float dt)
 {
     float alpha = 3.7453 * 2;
     float beta = 0.1453 * 2;
-    float grav = -9.08;
+    //float grav = -9.08;
     float total_accel = 0.0;
 
     Grid& g = *curGrid;
@@ -317,9 +312,9 @@ void Fluid::mesh(const float dt)
 
     const size_t X = g.xDim();
     const size_t Y = g.yDim();
-    const size_t Z = g.zDim();
+    //const size_t Z = g.zDim();
 
-    const float dx = g.getDx();
+    //const float dx = g.getDx();
 
     for (size_t i = 1; i < X - 1; ++i) {
         for (size_t j = 1; j < Y - 1; ++j) {

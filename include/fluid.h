@@ -29,7 +29,7 @@ public:
     Fluid(const uvec3&, const float, function<void (Grid&)>);
     ~Fluid();
 
-    const Grid& getGrid() const;
+    Grid& getGrid();
 
     void step(const float);
 };
