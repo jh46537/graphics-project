@@ -8,6 +8,7 @@ using std::cerr;
 using std::endl;
 using std::function;
 using std::vector;
+using std::string;
 
 
 #include <GL/gl3w.h>
@@ -26,11 +27,13 @@ using glm::lookAt;
 using glm::length;
 
 
+#define TINYOBJLOADER_IMPLEMENTATION
+#include "tiny_obj_loader.h"
+
+
 #include "grid.h"
 #include "fluid.h"
 #include "gl.h"
-
-bool Window::mesh = true;
 
 constexpr float pi = M_PI;
 constexpr size_t log_size = 1024;
@@ -207,7 +210,7 @@ void Shader::add(size_t type, const char* file_name) const
 
 
     size_t file_size = file.tellg();
-    std::string file_data( file_size, '\0' );
+    string file_data( file_size, '\0' );
     file.seekg(0, std::ios::beg);
     if (!file.read(&file_data[0], file_size)) {
         cerr << "[failed to read shader file: " << file_name << "]" << endl;
@@ -342,7 +345,8 @@ Window::Window(
     , float speed_t
     , float speed_p
     , float speed_div
-) : camera(1.0, pi, pi / 2, speed_r, speed_t, speed_p, speed_div)
+    , vector<string> mesh_files
+) : camera(1.0, pi, pi / 2, speed_r, speed_t, speed_p, speed_div), mesh_files(mesh_files)
 {
     /* initialize window */
     if (!glfwInit()) {
@@ -436,11 +440,11 @@ void Window::key_callback(GLFWwindow* window, int key, int scancode, int action,
         keys[key] = true;
     }
     else if (action == GLFW_RELEASE) {
-        if (key == GLFW_KEY_M)
-          Window::mesh = !Window::mesh;
         keys[key] = false;
     }
 }
+
+bool Window::mesh = true;
 
 void Window::handle_input()
 {
@@ -466,4 +470,59 @@ void Window::handle_input()
     if (false                || keys[GLFW_KEY_E] || keys[GLFW_KEY_O]) {
         camera.out(slow);
     }
+
+    if (keys[GLFW_KEY_M]) {
+        if (keys[GLFW_KEY_LEFT_SHIFT] || keys[GLFW_KEY_RIGHT_SHIFT]) {
+            mesh = !mesh;
+        }
+        load_mesh();
+    }
+}
+
+void Window::load_mesh()
+{
+    if (mesh_files.size() == 0) return;
+
+    if (!mesh) return;
+
+    mesh_index = (mesh_index + 1) % mesh_files.size();
+
+    tinyobj::attrib_t attribs;
+    vector<tinyobj::shape_t> shapes;
+    vector<tinyobj::material_t> materials;
+    string err;
+
+    tinyobj::LoadObj(&attribs, &shapes, &materials, &err, mesh_files[mesh_index].c_str());
+
+    if (!err.empty()) {
+          cerr << err << endl;
+    }
+
+    for (size_t i = 0; i < shapes.size(); ++i) {
+        const auto& mesh = shapes[i].mesh;
+        const auto& indices = mesh.indices;
+        for (size_t j = 0; j < indices.size(); j += 3) {
+            auto x = indices[j    ].vertex_index;
+            auto y = indices[j + 1].vertex_index;
+            auto z = indices[j + 2].vertex_index;
+            cout <<
+                attribs.vertices[3 * x    ] << " " <<
+                attribs.vertices[3 * x + 1] << " " <<
+                attribs.vertices[3 * x + 2] <<
+            endl;
+            cout <<
+                attribs.vertices[3 * y    ] << " " <<
+                attribs.vertices[3 * y + 1] << " " <<
+                attribs.vertices[3 * y + 2] <<
+            endl;
+            cout <<
+                attribs.vertices[3 * z    ] << " " <<
+                attribs.vertices[3 * z + 1] << " " <<
+                attribs.vertices[3 * z + 2] <<
+            endl;
+            cout << endl;
+        }
+    }
+
+    exit(0);
 }

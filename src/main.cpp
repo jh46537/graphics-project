@@ -30,6 +30,9 @@ int main(int argc, char** argv)
     };
     Fluid* sim = new Fluid{ dim, dx, setup};
 
+    vector<string> mesh_files{
+          "mesh/diamond.obj"
+    };
     Window* w = new Window{
           version_major
         , version_minor
@@ -40,6 +43,7 @@ int main(int argc, char** argv)
         , speed_t
         , speed_p
         , speed_div
+        , mesh_files
     };
 
     Shader* s = new Shader;
@@ -53,6 +57,7 @@ int main(int argc, char** argv)
     ////GLint opc_loc = s->uniform("opacity");
 
     w->start(max_quantity, max_loc);
+    w->load_mesh();
 
     VoxelGrid* v = new VoxelGrid{ sim->getGrid() };
 

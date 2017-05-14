@@ -11,6 +11,7 @@ using std::cout;
 using std::cerr;
 using std::endl;
 using std::vector;
+using std::string;
 using std::function;
 using std::max;
 

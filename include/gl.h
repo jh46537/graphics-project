@@ -83,10 +83,12 @@ class Window
 
     static bool keys[512];
 
+    vector<string> mesh_files;
+    size_t mesh_index = -1;
+
 public:
 
-    static bool mesh;
-    Window(size_t, size_t, size_t, size_t, const char*, float, float, float, float);
+    Window(size_t, size_t, size_t, size_t, const char*, float, float, float, float, vector<string>);
     ~Window();
 
     void start(const float, const GLint) const;
@@ -95,4 +97,7 @@ public:
 
     static void key_callback(GLFWwindow*, int, int, int, int);
     void handle_input();
+
+    static bool mesh;
+    void load_mesh();
 };

@@ -6,6 +6,7 @@ using std::cout;
 using std::cerr;
 using std::endl;
 using std::vector;
+using std::string;
 using std::function;
 
 
@@ -60,12 +61,6 @@ const Grid& Fluid::getGrid() const
     return *curGrid;
 }
 
-using std::cout;
-using std::cerr;
-using std::endl;
-using std::vector;
-using std::function;
-using std::max;
 static float frand(float min = 0.0, float max = 1.0)
 {
   return float(rand())/float(RAND_MAX) * (max - min) + min;
