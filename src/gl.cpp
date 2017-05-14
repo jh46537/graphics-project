@@ -482,16 +482,17 @@ void Window::handle_input()
         if (!(x == last_mouse_cell[0] && y == last_mouse_cell[1])) {
             last_mouse_cell[0] = x;
             last_mouse_cell[1] = y;
-            cout << x << " " << y << endl;;
+            cout << endl;
+            cout << "cell: (" << x << ", " << y << ")" << endl;;
 
             float dv_x = float(rand())/float(RAND_MAX) * (50.0) - 25.0;
             float dv_y = float(rand())/float(RAND_MAX) * (50.0) - 25.0;
-            cout << dv_x << " " << dv_y << endl;
+            cout << "dv: " << dv_x << ", " << dv_y << endl;
 
             auto& v = g(x, y, 0).velocity();
-            cout << v.x << " " << v.y << " " << v.z << endl;
+            cout << "old v: " << v.x << ", " << v.y << ", " << v.z << endl;
             v += vec3{ dv_x, dv_y, 0.0f };
-            cout << v.x << " " << v.y << " " << v.z << endl;
+            cout << "new v: " << v.x << ", " << v.y << ", " << v.z << endl;
         }
     }
 }
