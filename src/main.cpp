@@ -1,5 +1,10 @@
 #include "main.h"
 
+#include <fstream>
+#include <string>
+using std::ifstream;
+using std::string;
+
 float frand(float min = 0.0, float max = 1.0)
 {
   return float(rand())/float(RAND_MAX) * (max - min) + min;
@@ -15,7 +20,15 @@ int main(int argc, char** argv)
      * y:   -1 (down)             ->  +1 (up)
      * z:   -1 (out of screen)    ->  +1 (into screen)
      */
-    function<void (Grid&)> setup = [] (Grid& g)
+    ifstream mesh_f("mesh", ifstream::in);
+    string header;
+    mesh_f >> header;
+    if (header != "abc123") {
+        cout << "Invalid mesh format" << endl;
+        return 1;
+    }
+
+    function<void (Grid&)> setup = [&mesh_f] (Grid& g)
     {
         for (size_t i = 0; i < dim_x; ++i) {
             for (size_t j = 0; j < dim_y; ++j) {
@@ -24,6 +37,11 @@ int main(int argc, char** argv)
                     float r2 = frand(-5.0, 5.0);
                     float r3 = frand(-5.0, 5.0);
                     g(i, j, k).velocity() = vec3{ r1 * 5.0, r2 * 5.0, r3 * 5.0 };
+
+                    float m_x, m_y;
+                    mesh_f >> m_x;
+                    mesh_f >> m_y;
+                    g(i, j, k).M = vec3 {m_x, m_y, 0.0f};
                 }
             }
         }

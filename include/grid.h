@@ -15,6 +15,7 @@ public:
     public:
 
         vec3  V;
+        vec3  M;
         float Q;
         float D;
         float Te;

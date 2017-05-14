@@ -58,6 +58,11 @@ const Grid& Fluid::getGrid() const
     return *curGrid;
 }
 
+Grid& Fluid::getGrid()
+{
+    return *curGrid;
+}
+
 using std::cout;
 using std::cerr;
 using std::endl;
@@ -321,13 +326,12 @@ void Fluid::mesh(const float dt)
 
     for (size_t i = 1; i < X - 1; ++i) {
         for (size_t j = 1; j < Y - 1; ++j) {
-            vec3 dist = vec3(X/2,Y/2,0) - vec3(i,j,0);
-            if (length(dist) > radius) {
-                dist.x *= abs(dist.x);
-                dist.y *= abs(dist.y);
-                dist.z *= abs(dist.z);
-                g(i,j,0).V *= 0.1f;
-                g(i,j,0).V += dt * (1.f * (dist) * g(i,j,0).Q / max_quantity);
+            size_t y = Y-j;
+            vec3 mesh = g(i,y,0).M;
+            mesh *= length(mesh) * length(mesh);
+            if (length(mesh) != 0.0) {
+                g(i,j,0).V = -1.0f * dt * (mesh);
+                g(i,j,0).V *= g(i,j,0).Q / (max_quantity);
             }
         }
     }

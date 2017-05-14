@@ -30,6 +30,7 @@ public:
     ~Fluid();
 
     const Grid& getGrid() const;
+    Grid& getGrid();
 
     void step(const float);
 };
