@@ -45,7 +45,7 @@ constexpr float speed_t   = 0.01f;
 constexpr float speed_p   = 0.01f;
 constexpr float speed_div = 0.10f;
 
-constexpr size_t N     = 100;
+constexpr size_t N     = 10;
 constexpr size_t dim_x = N;
 constexpr size_t dim_y = N;
 constexpr size_t dim_z = 1;

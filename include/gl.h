@@ -79,20 +79,30 @@ class Window
 {
     GLFWwindow* window;
 
+    size_t width;
+    size_t height;
+
+    Fluid& sim;
+
     Camera camera;
 
     static bool keys[512];
 
+    static bool   click;
+    static double mouse_start[2];
+    static double mouse_end[2];
+
 public:
 
     static bool mesh;
-    Window(size_t, size_t, size_t, size_t, const char*, float, float, float, float);
+    Window(size_t, size_t, size_t, size_t, const char*, Fluid&, float, float, float, float);
     ~Window();
 
     void start(const float, const GLint) const;
     bool alive() const;
-    void render(VoxelGrid&, const Fluid&, const GLint);
+    void render(VoxelGrid&, Fluid&, const GLint);
 
     static void key_callback(GLFWwindow*, int, int, int, int);
     void handle_input();
+    static void mouse_callback(GLFWwindow*, int, int, int);
 };
