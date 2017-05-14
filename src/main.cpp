@@ -87,8 +87,8 @@ int main(int argc, char** argv)
             auto t_start = clk::now();
             w->render(*v, *sim, mvp_loc);
             auto t_end   = clk::now();
-            //cout << "[render after " << num_ticks << " simulations]" << endl;
-            //cout << "[render took " << (t_end - t_start).count() << " ns]" << endl;
+            cout << "[render after " << num_ticks << " simulations]" << endl;
+            cout << "[render took " << (t_end - t_start).count() << " ns]" << endl;
             dt = 1.0 / (fps * num_ticks);
             num_ticks = 0;
         }
