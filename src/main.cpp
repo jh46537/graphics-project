@@ -23,7 +23,7 @@ int main(int argc, char** argv)
                     float r1 = frand(-5.0, 5.0);
                     float r2 = frand(-5.0, 5.0);
                     float r3 = frand(-5.0, 5.0);
-                    //g(i, j, k).velocity() = vec3{ r1 * 5.0, r2 * 5.0, r3 * 5.0 };
+                    g(i, j, k).velocity() = vec3{ r1 * 5.0, r2 * 5.0, r3 * 5.0 };
                 }
             }
         }
