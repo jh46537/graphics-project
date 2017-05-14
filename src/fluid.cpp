@@ -107,10 +107,8 @@ void Fluid::step(const float dt)
               g(i, j, k).quantity() += frand(25,35);
               g(i, j, k).Te += frand(10, 40.0);
             }
-            float scale = 1.0f;
-            float xmv = frand(-scale, scale);
-            float ymv = frand(-scale, scale);
-            g(i, j, k).V += dt * vec3(xmv, ymv, 0);
+            float scale = 10.0f;
+            g(i, j, k).V += dt * vec3(scale, 0, 0);
           }
         }
       }
@@ -237,8 +235,8 @@ void Fluid::project(const float dt)
 
 void Fluid::forces(const float dt)
 {
-    float alpha = 3.7453 * 2;
-    float beta = 0.1453 * 2;
+    float alpha = 3.7453;
+    float beta = 0.1453;
     float grav = -9.08;
     float total_accel = 0.0;
 
@@ -327,7 +325,8 @@ void Fluid::mesh(const float dt)
     for (size_t i = 1; i < X - 1; ++i) {
         for (size_t j = 1; j < Y - 1; ++j) {
             size_t y = Y-j;
-            vec3 mesh = g(i,y,0).M;
+            size_t x = X-i;
+            vec3 mesh = g(x,y,0).M;
             mesh *= length(mesh) * length(mesh);
             if (length(mesh) != 0.0) {
                 g(i,j,0).V = -1.0f * dt * (mesh);

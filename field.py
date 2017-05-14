@@ -2,6 +2,12 @@
 from PIL import Image, ImageColor, ImageDraw
 import itertools
 from math import sqrt
+import sys
+
+if len(sys.argv) < 2 or not sys.argv[1]:
+    print 'Please provide a file!!!'
+    sys.exit(1)
+input_file = sys.argv[1]
 
 def dist(pos1, pos2):
     return sqrt(pow(pos1[0] - pos2[0], 2) + pow(pos1[1] - pos2[1], 2))
@@ -17,7 +23,7 @@ def closest(i,j):
             min_pix = (x,y)
     return min_pix
 
-im = Image.open('in2.png')
+im = Image.open(input_file)
 pix = im.load()
 
 w,h = im.size
@@ -63,7 +69,7 @@ for x in xrange(0,w):
 draw.ellipse([0, 0, 5, 5])
 out_im.show()
 
-with open('mesh', 'w') as f:
+with open('%s.mesh' % input_file, 'w') as f:
     f.write('abc123')
     for x in xrange(0,w):
         for y in xrange(0,h):
