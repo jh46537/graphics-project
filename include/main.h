@@ -1,7 +1,7 @@
 #pragma once
 
 #include <iostream>
-//#include <fstream>
+#include <fstream>
 #include <vector>
 #include <functional>
 #include <chrono>
@@ -10,7 +10,9 @@
 using std::cout;
 using std::cerr;
 using std::endl;
+using std::ifstream;
 using std::vector;
+using std::string;
 using std::function;
 using std::max;
 

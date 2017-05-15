@@ -60,17 +60,6 @@ Grid& Fluid::getGrid()
     return *curGrid;
 }
 
-const Grid& Fluid::getGrid() const
-{
-    return *curGrid;
-}
-
-using std::cout;
-using std::cerr;
-using std::endl;
-using std::vector;
-using std::function;
-using std::max;
 static float frand(float min = 0.0, float max = 1.0)
 {
   return float(rand())/float(RAND_MAX) * (max - min) + min;
@@ -112,6 +101,10 @@ void Fluid::step(const float dt)
             }
             float scale = 10.0f;
             g(i, j, k).V += dt * vec3(scale, 0, 0);
+            //float scale = 1.0f;
+            //float xmv = frand(-scale, scale);
+            //float ymv = frand(-scale, scale);
+            //g(i, j, k).V += dt * vec3(xmv, ymv, 0);
           }
         }
       }
@@ -240,7 +233,7 @@ void Fluid::forces(const float dt)
 {
     float alpha = 3.7453;
     float beta = 0.1453;
-    float grav = -9.08;
+    //float grav = -9.08;
     float total_accel = 0.0;
 
     Grid& g = *curGrid;
@@ -335,6 +328,14 @@ void Fluid::mesh(const float dt)
                 g(i,j,0).V = -1.0f * dt * (mesh);
                 g(i,j,0).V *= g(i,j,0).Q / (max_quantity);
             }
+            //vec3 dist = vec3(X/2,Y/2,0) - vec3(i,j,0);
+            //if (length(dist) > radius) {
+            //    dist.x *= abs(dist.x);
+            //    dist.y *= abs(dist.y);
+            //    dist.z *= abs(dist.z);
+            //    g(i,j,0).V *= 0.1f;
+            //    g(i,j,0).V += dt * (1.f * (dist) * g(i,j,0).Q / max_quantity);
+            //}
         }
     }
 }
