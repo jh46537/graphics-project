@@ -486,8 +486,8 @@ void Window::handle_input()
             //cout << endl;
             //cout << "cell: (" << x << ", " << y << ")" << endl;;
 
-            float dv_x = float(rand())/float(RAND_MAX) * (50.0) - 25.0;
-            float dv_y = float(rand())/float(RAND_MAX) * (50.0) - 25.0;
+            float dv_x = float(rand())/float(RAND_MAX) * (1000.0) - 25.0;
+            float dv_y = float(rand())/float(RAND_MAX) * (1000.0) - 25.0;
             //cout << "dv: " << dv_x << ", " << dv_y << endl;
 
             auto& v = g(x, y, 0).velocity();
