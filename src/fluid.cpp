@@ -295,20 +295,22 @@ void Fluid::forces(const float dt)
         for (size_t i = 1; i < X - 1; ++i) {
             for (size_t j = 1; j < Y - 1; ++j) {
                 nu[i][j][k] = vec3(
-                                    omega[i+1][j][k].x - omega[i-1][j][k].x * 0.5 * 1 / dx
-                                  , omega[i][j+1][k].y - omega[i][j-1][k].y * 0.5 * 1 / dx
-                                  , omega[i][j][k+1].z - omega[i][j][k-1].z * 0.5 * 1 / dx
+                                    abs(omega[i+1][j][k].x - omega[i-1][j][k].x) * 0.5 * 1 / dx
+                                  , abs(omega[i][j+1][k].y - omega[i][j-1][k].y) * 0.5 * 1 / dx
+                                  , abs(omega[i][j][k+1].z - omega[i][j][k-1].z) * 0.5 * 1 / dx
                               );
-                psi[i][j][k] = vec3(
-                                    nu[i][j][k].x / abs(nu[i][j][k].x)
-                                  , nu[i][j][k].y / abs(nu[i][j][k].y)
-                                  , nu[i][j][k].z / abs(nu[i][j][k].z)
-                              );
-                vec3 crossed = cross(psi[i][j][k], omega[i][j][k]);
-                crossed.x *= vorticity_epsilon * dx * dt;
-                crossed.y *= vorticity_epsilon * dx * dt;
-                crossed.z *= vorticity_epsilon * dx * dt;
-                g(i, j, k).V += crossed;
+                if(abs(nu[i][j][k].x) > 0.00001 && abs(nu[i][j][k].y) > 0.00001 && abs(nu[i][j][k].z) > 0.00001){
+                    psi[i][j][k] = vec3(
+                                        nu[i][j][k].x / abs(nu[i][j][k].x)
+                                      , nu[i][j][k].y / abs(nu[i][j][k].y)
+                                      , nu[i][j][k].z / abs(nu[i][j][k].z)
+                                  );
+                    vec3 crossed = cross(psi[i][j][k], omega[i][j][k]);
+                    crossed.x *= vorticity_epsilon * dx * dt;
+                    crossed.y *= vorticity_epsilon * dx * dt;
+                    crossed.z *= vorticity_epsilon * dx * dt;
+                    g(i, j, k).V += crossed;
+                }
             }
         }
     }
@@ -333,7 +335,7 @@ void Fluid::mesh(const float dt)
             mesh *= length(mesh) * length(mesh);
             if (length(mesh) != 0.0) {
                 g(i,j,0).V = -1.0f * dt * (mesh);
-                g(i,j,0).V *= g(i,j,0).Q / (max_quantity);
+                g(i,j,0).V *= (g(i,j,0).Q) / (max_quantity);
             }
         }
     }
