@@ -16,6 +16,8 @@ using std::function;
 using glm::vec3;
 using glm::uvec3;
 using glm::mat4;
+using glm::length;
+using glm::cross;
 
 #include "grid.h"
 #include "fluid.h"
@@ -252,7 +254,7 @@ void Fluid::forces(const float dt)
 {
     float alpha = 3.7453 * 0.25;
     float beta = 0.1453 * 2;
-    float grav = -9.08;
+    //float grav = -9.08;
     float total_accel = 0.0;
 
     Grid& g = *curGrid;
@@ -336,7 +338,7 @@ void Fluid::mesh(const float dt)
     const size_t Y = g.yDim();
     const size_t Z = g.zDim();
 
-    const float dx = g.getDx();
+    //const float dx = g.getDx();
 
     for (size_t i = 1; i < X - 1; ++i) {
         for (size_t j = 1; j < Y - 1; ++j) {
