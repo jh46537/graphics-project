@@ -100,7 +100,7 @@ void Fluid::step(const float dt)
           if (i >= X/2 - 1 && i <= X/2 + 1 &&
               j >= Y/2 - 1 && j <= Y/2 + 1 &&
               k >= Z/2 - 1 && k <= Z/2 + 1) {
-            if (g.totalQuantity() < 10000) {
+            if (g.totalQuantity() < 1000000) {
               g(i, j, k).quantity() += frand(10,20);
               g(i, j, k).Te += frand(30, 40.0);
             }
@@ -327,7 +327,7 @@ void Fluid::forces(const float dt)
     }
 }
 
-constexpr float radius = 5.0;
+constexpr float radius = 10.0;
 void Fluid::mesh(const float dt)
 {
     Grid& g = *curGrid;

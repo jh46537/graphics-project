@@ -33,7 +33,7 @@ using glm::lookAt;
 constexpr float pi = M_PI;
 constexpr size_t log_size = 1024;
 
-constexpr bool draw_velocity = true;
+constexpr bool draw_velocity = false;
 constexpr float max_velocity = 50.0;
 
 /*
