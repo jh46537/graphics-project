@@ -9,6 +9,7 @@ using std::vector;
 using std::function;
 
 
+#include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #define GLM_FORCE_RADIANS
 #include <glm/gtc/matrix_transform.hpp>
@@ -21,6 +22,7 @@ using glm::cross;
 
 #include "grid.h"
 #include "fluid.h"
+#include "gl.h"
 
 constexpr float max_quantity = 1000.0f;
 
@@ -71,7 +73,8 @@ void Fluid::step(const float dt)
     advect(dt);
     swap();
     //forces(dt);
-    mesh(dt);
+    if (Window::mesh)
+        mesh(dt);
     project(dt);
     swap();
 
