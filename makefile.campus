@@ -1,0 +1,41 @@
+SRCD = src
+INCD = include
+OBJD = build
+
+CC = g++
+CFLG = -std=c++14 -g -O3 -Wall
+INCS = -Iinclude -I/lusr/opt/glfw-3.1.2/include
+LFLG =
+LIBS = $(shell pkg-config --static --libs glfw3)
+
+SRCS = $(shell find $(SRCD) -name *.cpp -or -name *.c)
+OBJS = $(patsubst $(SRCD)/%.c,$(OBJD)/%.o,$(patsubst $(SRCD)/%.cpp,$(OBJD)/%.o,$(SRCS)))
+DEPS = $(OBJS:.o=.d)
+EXEC = smoke
+
+.PHONY: all $(OBJD) clean run
+
+all: $(OBJD) $(OBJS)
+	$(CC) $(OBJS) -o $(EXEC) $(LFLG) $(LIBS)
+
+-include $(DEPS)
+
+$(OBJD)/%.o: $(SRCD)/%.cpp
+
+	$(CC) $(CFLG) -c  $< -o $@ $(INCS) 
+	@$(CC) $(CFLG) -MM $< > $(OBJD)/$*.d $(INCS) 
+	@sed -i 's/^.*:/build\/&/' $(OBJD)/$*.d
+
+$(OBJD)/%.o: $(SRCD)/%.c
+	$(CC) $(CFLG) -c  $< -o $@ $(INCS) 
+	@$(CC) $(CFLG) -MM $< > $(OBJD)/$*.d $(INCS) 
+	@sed -i 's/^.*:/build\/&/' $(OBJD)/$*.d
+
+$(OBJD):
+	mkdir -p $(OBJD)
+
+clean:
+	rm -rf $(OBJS) $(OBJSD) $(DEPS) $(EXEC)
+
+run:
+	./smoke

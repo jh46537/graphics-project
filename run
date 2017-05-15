@@ -20,4 +20,4 @@ fi
 
 echo "[simulating $1 mode]"
 git checkout "$branch"
-make && make run
+make -f makefile.campus && make -f makefile.campus run
