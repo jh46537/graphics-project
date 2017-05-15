@@ -23,6 +23,7 @@ using glm::uvec3;
 using glm::mat4;
 using glm::perspective;
 using glm::lookAt;
+using glm::length;
 
 
 #include "grid.h"

@@ -1,0 +1,23 @@
+#!/bin/bash
+
+if [ "$#" -ne 1 ] || [ "$1" != '2d' -a "$1" != '3d' ]
+then
+    echo "ERROR: incorrect arguments"
+    echo "usage: ./run <mode>"
+    echo "    modes"
+    echo "        2d - 2d mode"
+    echo "        3d - 3d mode"
+    exit -1
+fi
+
+if [ "$1" == '2d' ]
+then
+    branch='master'
+elif [ "$1" == '3d' ]
+then
+    branch='3d'
+fi
+
+echo "[simulating $1 mode]"
+git checkout "$branch"
+make && make run
