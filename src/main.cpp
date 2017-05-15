@@ -1,10 +1,5 @@
 #include "main.h"
 
-#include <fstream>
-#include <string>
-using std::ifstream;
-using std::string;
-
 float frand(float min = 0.0, float max = 1.0)
 {
   return float(rand())/float(RAND_MAX) * (max - min) + min;
