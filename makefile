@@ -8,7 +8,7 @@ INCS = -Iinclude
 LFLG =
 LIBS = -lglfw -ldl
 
-SRCS = $(shell find $(SRCD) -name *.cpp -or -name *.c)
+SRCS = $(shell find $(SRCD) -name '*.cpp' -or -name '*.c')
 OBJS = $(patsubst $(SRCD)/%.c,$(OBJD)/%.o,$(patsubst $(SRCD)/%.cpp,$(OBJD)/%.o,$(SRCS)))
 DEPS = $(OBJS:.o=.d)
 EXEC = smoke
